@@ -2,19 +2,22 @@ import React, { Component } from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
 
 import "./App.css";
-import { auth } from "./firebase";
+import firebase, { auth, db } from "./firebase";
 import SignIn from "./SignIn";
+import Main from "./Main";
 
 class App extends Component {
   state = {
-    user: null
+    uid: null,
+    user: null,
+    workspace: null
   };
 
   componentDidMount() {
-    const login = window.localStorage.getItem("login");
-    if (login !== "null") {
-      this.handleAuth(login);
-    }
+    // const login = window.localStorage.getItem("login");
+    // if (login !== "null") {
+    //   this.handleAuth(login);
+    // }
 
     auth.onAuthStateChanged(user => {
       if (user) {
@@ -25,18 +28,36 @@ class App extends Component {
     });
   }
 
-  handleAuth = user => {
-    this.setState({ user });
-    window.localStorage.setItem("login", this.state.user);
+  handleAuth = uid => {
+    const user = auth.currentUser;
+    db.collection("users")
+      .doc(uid)
+      .get()
+      .then(doc => {
+        if (doc.exists) {
+          this.setState({ user: doc.data(), uid: uid });
+        } else {
+          db.collection("users")
+            .doc(uid)
+            .set({
+              name: user.displayName,
+              email: user.email,
+              id: user.uid,
+              workspaces: []
+            });
+          this.handleAuth(uid);
+        }
+      });
+    // window.localStorage.setItem("login", uid);
   };
 
   signedIn = () => {
-    return this.state.user;
+    return this.state.uid;
   };
 
   signOut = () => {
-    window.localStorage.removeItem("login");
-    this.setState({ user: null });
+    // window.localStorage.removeItem("login");
+    this.setState({ uid: null, user: null, workspace: null });
     auth.signOut();
   };
 
@@ -55,9 +76,13 @@ class App extends Component {
             }
           />
           <Route
-            path="workspace"
+            path="/workspace"
             render={navProps =>
-              this.signedIn() ? <p>signedin</p> : <Redirect to="/signin" />
+              this.signedIn() ? (
+                <Main signOut={this.signOut} user={this.state.user} />
+              ) : (
+                <Redirect to="/signin" />
+              )
             }
           />
           <Route
