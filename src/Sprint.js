@@ -11,11 +11,11 @@ class Sprint extends React.Component {
 
   newSprint() {
     return {
-      id: 'asdf',
+      id: null,
     };
   }
 
-  componentDidMount() {
+  componentDidUpdate() {
     const newID = this.props.match.params.sid || null;
     const oldID = this.state.sprint.id || null;
     if (newID !== oldID) {
@@ -32,32 +32,34 @@ class Sprint extends React.Component {
   }
 
   render() {
-    //if (this.state.sprint.id == null) {
-      return (
-        <div>
-          <h1>Sprints</h1>
-          <ul id="sprints">
-            {this.props.sprints.map((s, index) => (
-              <div key={index}>
-                <Link to={`/workspace/${this.props.workspace.id}/${s.id}`}>
-                  <p>{s.id}</p>
-                </Link>
-              </div>
-            ))}
-          </ul>
-          <div>Start a sprint!</div>
+    return (
+      <div>
+        <h1>Sprints</h1>
+        <ul id="sprints">
+          {this.props.sprints.map((s, index) => (
+            <div key={index}>
+              <Link to={`/workspace/${this.props.workspace.id}/${s.id}`}>
+                <p>{s.id}</p>
+              </Link>
+            </div>
+          ))}
+        </ul>
 
-          <form
-            onSubmit={event => {
-              event.preventDefault();
-              this.props.createSprint();
-            }}
-          >
-            <button>create</button>
-          </form>
-        </div>
-      );
-    //}
+        {this.state.sprint.id == null && (
+          <div>
+            Start a sprint!
+            <form
+              onSubmit={event => {
+                event.preventDefault();
+                this.props.createSprint();
+              }}
+            >
+              <button>create</button>
+            </form>
+          </div>
+        )}
+      </div>
+    );
   }
 }
 
