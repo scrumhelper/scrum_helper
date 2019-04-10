@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^3.9.3",
     "firebase": "^5.9.3",
     "firebaseui": "^3.5.2",
     "react": "^16.8.6",
