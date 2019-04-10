@@ -10,8 +10,9 @@ class App extends Component {
   state = {
     uid: null,
     user: null,
-    workspace: null,
-    sprint: null
+    workspaces: [],
+    sprints: [],
+    users: []
   };
 
   componentDidMount() {
@@ -36,9 +37,7 @@ class App extends Component {
       .get()
       .then(doc => {
         if (doc.exists) {
-          this.loadUser(uid, true, user => {
-            this.setState({ user, uid: uid });
-          });
+          this.loadUser(uid, true, () => this.setState({ uid: uid }));
         } else {
           this.createUser(user);
           this.handleAuth(uid);
@@ -57,10 +56,11 @@ class App extends Component {
       });
   };
 
-  createWorkspace = () => {
+  createWorkspace = name => {
     db.collection("workspaces")
       .add({
-        users: [this.state.user.id],
+        name: name,
+        users: [this.state.uid],
         sprints: []
       })
       .then(docRef => {
@@ -68,12 +68,11 @@ class App extends Component {
           .doc(docRef.id)
           .set(
             {
-              name: docRef.id,
               id: docRef.id
             },
             { merge: true }
           );
-        this.addWorkspace(docRef.id);
+        this.addWorkspaceToUser(docRef.id);
         this.loadWorkspace(docRef.id);
       });
   };
@@ -109,12 +108,12 @@ class App extends Component {
             { merge: true }
           );
 
-        this.addSprint(docRef.id);
+        this.addSprintToWorkspace(docRef.id);
         this.loadSprint(docRef.id);
       });
   };
 
-  addWorkspace = wid => {
+  addWorkspaceToUser = wid => {
     this.setState(
       {
         user: {
@@ -126,7 +125,7 @@ class App extends Component {
     );
   };
 
-  addSprint = sid => {
+  addSprintToWorkspace = sid => {
     this.setState(
       {
         workspace: {
@@ -152,48 +151,40 @@ class App extends Component {
       .catch(error => console.error("Error in getting document: ", error));
   };
 
-  loadWorkspace = (wid, callback) => {
+  loadWorkspace = wid => {
     this.loadDoc("workspaces", wid, ws => {
-      ws.users = ws.users.map(uid => this.loadUser(uid));
-      ws.sprints = ws.sprints.map(sid => this.loadSprint(sid));
-
-      callback(ws);
+      this.setState({
+        workspaces: [...this.state.workspaces, ws]
+      });
+      ws.users.forEach(uid => this.loadUser(uid, false));
+      ws.sprints.forEach(sid => this.loadSprint(sid));
     });
   };
 
   loadUser = (uid, complete, callback) => {
     this.loadDoc("users", uid, user => {
       if (complete)
-        user.workspaces.forEach(wid =>
-          this.loadWorkspace(wid, ws =>
-            this.setState({
-              user: {
-                ...this.state.user,
-                workspaces: [...this.state.workspaces, ws]
-              }
-            })
-          )
-        );
-
-      callback(user);
+        this.setState({ user }, () => {
+          user.workspaces.forEach(wid => this.loadWorkspace(wid));
+          if (callback) callback();
+        });
+      else
+        this.setState({ users: [...this.state.users, user] }, () => {
+          if (callback) callback();
+        });
     });
   };
 
-  loadSprint = (sid, callback) => {
+  loadSprint = sid => {
     this.loadDoc("sprints", sid, s => {
-      s.roles.scrumMaster = this.state.workspace.users.find(
-        u => u.id == s.roles.scrumMaster
-      );
-      s.roles.productOwner = this.state.workspace.users.find(
-        u => u.id == s.roles.productOwner
-      );
-
       s.events.sprintReview = new Date(s.events.sprintReview);
       s.events.dailyScrum = new Date(s.events.dailyScrum);
       s.events.sprintPlanning = new Date(s.events.sprintPlanning);
       s.events.sprintRetrospective = new Date(s.events.sprintRetrospective);
 
-      callback(s);
+      this.setState({
+        sprints: [...this.state.sprints, s]
+      });
     });
   };
 
@@ -209,12 +200,12 @@ class App extends Component {
     this.saveDoc("users", this.state.uid, this.state.user);
   };
 
-  saveWorkspace = () => {
-    this.saveDoc("workspaces", this.state.workspace.id, this.state.workspace);
+  saveWorkspace = (workspace) => {
+    this.saveDoc("workspaces", workspace.id, workspace);
   };
 
-  saveSprint = () => {
-    this.saveDoc("sprints", this.state.sprint.id, this.state.sprint);
+  saveSprint = (sprint) => {
+    this.saveDoc("sprints", sprint.id, sprint);
   };
 
   signedIn = () => {
@@ -264,8 +255,8 @@ class App extends Component {
                     }
                   }}
                   user={this.state.user}
-                  workspace={this.state.workspace}
-                  sprint={this.state.sprint}
+                  workspaces={this.state.workspaces}
+                  sprints={this.state.sprints}
                 />
               ) : (
                 <Redirect to="/signin" />
