@@ -4,7 +4,7 @@ import 'firebase/firestore'
 import config from "./config.js";
 
 const app = firebase.initializeApp(config);
-const firestore = firebase.firestore();
 
 export const auth = app.auth();
+export const db = app.firestore();
 export const githubAuthProvider = new firebase.auth.GithubAuthProvider();
