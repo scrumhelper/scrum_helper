@@ -1,20 +1,21 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
-const WorkspaceElement = ({ wid }) => {
+const WorkspaceElement = ({ workspace }) => {
   return (
     <div className="WorkspaceElement">
-      <h1>wid</h1>
+      <Link to={`/workspace/${workspace.id}`}>{workspace.name}</Link>
     </div>
   );
 };
 
-const Sidebar = ({ wids }) => {
+const Sidebar = ({ workspaces }) => {
   return (
     <div className="Sidebar">
       <h1>Workspaces</h1>
       <ul id="workspaces">
-        {wids.map((wid, index) => (
-          <WorkspaceElement key={index} wid={wid} />
+        {workspaces.map((workspace, index) => (
+          <WorkspaceElement key={index} workspace={workspace} />
         ))}
       </ul>
     </div>

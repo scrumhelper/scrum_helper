@@ -77,42 +77,6 @@ class App extends Component {
       });
   };
 
-  createSprint = () => {
-    db.collection("sprints")
-      .add({
-        artifacts: {
-          productBacklog: null,
-          sprintBacklog: null,
-          sprintRetrospective: null,
-          sprintPlanning: null
-        },
-        roles: {
-          scrumMaster: null,
-          productOwner: null,
-          team: [this.state.uid]
-        },
-        events: {
-          sprintReview: null,
-          dailyScrum: null,
-          sprintPlanning: null,
-          sprintRetrospective: null
-        }
-      })
-      .then(docRef => {
-        db.collection("sprints")
-          .doc(docRef.id)
-          .set(
-            {
-              id: docRef.id
-            },
-            { merge: true }
-          );
-
-        this.addSprintToWorkspace(docRef.id);
-        this.loadSprint(docRef.id);
-      });
-  };
-
   addWorkspaceToUser = wid => {
     this.setState(
       {
@@ -122,18 +86,6 @@ class App extends Component {
         }
       },
       this.saveUser
-    );
-  };
-
-  addSprintToWorkspace = sid => {
-    this.setState(
-      {
-        workspace: {
-          ...this.state.workspace,
-          sprints: [...this.state.workspace.sprints, sid]
-        }
-      },
-      this.saveWorkspace
     );
   };
 
@@ -151,16 +103,6 @@ class App extends Component {
       .catch(error => console.error("Error in getting document: ", error));
   };
 
-  loadWorkspace = wid => {
-    this.loadDoc("workspaces", wid, ws => {
-      this.setState({
-        workspaces: [...this.state.workspaces, ws]
-      });
-      ws.users.forEach(uid => this.loadUser(uid, false));
-      ws.sprints.forEach(sid => this.loadSprint(sid));
-    });
-  };
-
   loadUser = (uid, complete, callback) => {
     this.loadDoc("users", uid, user => {
       if (complete)
@@ -175,16 +117,29 @@ class App extends Component {
     });
   };
 
-  loadSprint = sid => {
-    this.loadDoc("sprints", sid, s => {
-      s.events.sprintReview = new Date(s.events.sprintReview);
-      s.events.dailyScrum = new Date(s.events.dailyScrum);
-      s.events.sprintPlanning = new Date(s.events.sprintPlanning);
-      s.events.sprintRetrospective = new Date(s.events.sprintRetrospective);
-
+  loadWorkspace = wid => {
+    this.loadDoc("workspaces", wid, ws => {
       this.setState({
-        sprints: [...this.state.sprints, s]
+        workspaces: [...this.state.workspaces.filter(w => w.id != wid), ws]
       });
+      ws.users.forEach(uid => this.loadUser(uid, false));
+      ws.sprints.forEach(sid => this.loadSprint(sid));
+    });
+  };
+
+  loadSprint = (sid, callback) => {
+    this.loadDoc("sprints", sid, s => {
+      // s.events.sprintReview = new Date(s.events.sprintReview);
+      // s.events.dailyScrum = new Date(s.events.dailyScrum);
+      // s.events.sprintPlanning = new Date(s.events.sprintPlanning);
+      // s.events.sprintRetrospective = new Date(s.events.sprintRetrospective);
+
+      this.setState(
+        {
+          sprints: [...this.state.sprints.filter(s => s.id != sid), s]
+        },
+        callback
+      );
     });
   };
 
@@ -200,12 +155,21 @@ class App extends Component {
     this.saveDoc("users", this.state.uid, this.state.user);
   };
 
-  saveWorkspace = (workspace) => {
+  saveWorkspace = workspace => {
     this.saveDoc("workspaces", workspace.id, workspace);
+    this.setState({
+      workspaces: [
+        ...this.state.workspaces.filter(w => w.id != workspace.id),
+        workspace
+      ]
+    });
   };
 
-  saveSprint = (sprint) => {
+  saveSprint = sprint => {
     this.saveDoc("sprints", sprint.id, sprint);
+    this.setState({
+      sprints: [...this.state.sprints.filter(s => s.id != sprint.id), sprint]
+    });
   };
 
   signedIn = () => {
@@ -214,7 +178,13 @@ class App extends Component {
 
   signOut = () => {
     // window.localStorage.removeItem("login");
-    this.setState({ uid: null, user: null, workspace: null });
+    this.setState({
+      uid: null,
+      user: null,
+      workspaces: [],
+      sprints: [],
+      users: []
+    });
     auth.signOut();
   };
 

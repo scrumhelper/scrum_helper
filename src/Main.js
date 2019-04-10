@@ -8,15 +8,29 @@ class Main extends React.Component {
   render() {
     return (
       <div>
-        <Sidebar wids={this.props.user.workspaces}/>
+        <Sidebar workspaces={this.props.workspaces} />
         <Switch>
           <Route
-            path="/workspace/:id"
-            render={navProps => <Workspace {...navProps} />}
+            path="/workspace/:wid"
+            render={navProps => (
+              <Workspace
+                functions={this.props.functions}
+                workspaces={this.props.workspaces}
+                sprints={this.props.sprints}
+                {...navProps}
+              />
+            )}
           />
           <Route
             path="/workspace"
-            render={navProps => <Workspace {...navProps} />}
+            render={navProps => (
+              <Workspace
+                functions={this.props.functions}
+                workspaces={this.props.workspaces}
+                sprints={this.props.sprints}
+                {...navProps}
+              />
+            )}
           />
         </Switch>
       </div>
