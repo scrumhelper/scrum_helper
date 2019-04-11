@@ -26,7 +26,7 @@ class Sprint extends React.Component {
         });
       else
         this.setState({
-          sprint: this.props.sprints.find(s => s.id == newID)
+          sprint: this.props.sprints.find(s => s.id === newID)
         });
     }
   }
@@ -36,7 +36,7 @@ class Sprint extends React.Component {
       <div>
         <h1>Sprints</h1>
 
-        {this.state.sprint.id == null && (
+        {this.state.sprint.id === null && (
           <div>
             Start a sprint!
             <form

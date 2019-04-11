@@ -120,7 +120,7 @@ class App extends Component {
   loadWorkspace = wid => {
     this.loadDoc("workspaces", wid, ws => {
       this.setState({
-        workspaces: [...this.state.workspaces.filter(w => w.id != wid), ws]
+        workspaces: [...this.state.workspaces.filter(w => w.id !== wid), ws]
       });
       ws.users.forEach(uid => this.loadUser(uid, false));
       ws.sprints.forEach(sid => this.loadSprint(sid));
@@ -136,7 +136,7 @@ class App extends Component {
 
       this.setState(
         {
-          sprints: [...this.state.sprints.filter(s => s.id != sid), s]
+          sprints: [...this.state.sprints.filter(s => s.id !== sid), s]
         },
         callback
       );
@@ -159,7 +159,7 @@ class App extends Component {
     this.saveDoc("workspaces", workspace.id, workspace);
     this.setState({
       workspaces: [
-        ...this.state.workspaces.filter(w => w.id != workspace.id),
+        ...this.state.workspaces.filter(w => w.id !== workspace.id),
         workspace
       ]
     });
@@ -168,7 +168,7 @@ class App extends Component {
   saveSprint = sprint => {
     this.saveDoc("sprints", sprint.id, sprint);
     this.setState({
-      sprints: [...this.state.sprints.filter(s => s.id != sprint.id), sprint]
+      sprints: [...this.state.sprints.filter(s => s.id !== sprint.id), sprint]
     });
   };
 

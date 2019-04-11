@@ -75,7 +75,7 @@ class Workspace extends React.Component {
           this.setState({
             sprints: [
               ...this.state.sprints,
-              this.props.sprints.find(s => s.id == docRef.id)
+              this.props.sprints.find(s => s.id === docRef.id)
             ]
           })
         );
@@ -117,12 +117,12 @@ class Workspace extends React.Component {
       else
         this.setState(
           {
-            workspace: this.props.workspaces.find(w => w.id == newID)
+            workspace: this.props.workspaces.find(w => w.id === newID)
           },
           () => {
             this.setState({
               sprints: this.state.workspace.sprints.map(s =>
-                this.props.sprints.find(sp => sp.id == s)
+                this.props.sprints.find(sp => sp.id === s)
               )
             });
           }
@@ -144,11 +144,11 @@ class Workspace extends React.Component {
               <Menu />
             </IconButton>
             <Typography style={{ flexGrow: 1 }} color="inherit">
-              {this.state.workspace.id == null
+              {this.state.workspace.id === null
                 ? "Scrum Helper"
                 : this.state.workspace.name}
             </Typography>
-            {this.props.user == null ? (
+            {this.props.user === null ? (
               <Button color="inherit">Login</Button>
             ) : (
               <Button color="inherit" onClick={() => this.props.signOut()}>
@@ -174,7 +174,7 @@ class Workspace extends React.Component {
             />
           </div>
         </SwipeableDrawer>
-        {this.state.workspace.id == null ? (
+        {this.state.workspace.id === null ? (
           <div>
             <form
               onSubmit={event => {
