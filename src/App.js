@@ -73,7 +73,6 @@ class App extends Component {
             { merge: true }
           );
         this.addWorkspaceToUser(docRef.id);
-        this.loadWorkspace(docRef.id);
       });
   };
 
@@ -87,6 +86,7 @@ class App extends Component {
       },
       this.saveUser
     );
+    this.loadWorkspace(wid);
   };
 
   loadDoc = (collection, id, callback) => {
@@ -222,6 +222,9 @@ class App extends Component {
                     create: {
                       workspace: this.createWorkspace,
                       sprint: this.createSprint
+                    },
+                    add: {
+                      workspace: this.addWorkspaceToUser
                     }
                   }}
                   user={this.state.user}

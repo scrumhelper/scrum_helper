@@ -10,20 +10,19 @@ class Workspace extends React.Component {
     super(props);
     this.state = {
       workspace: this.newWorkspace(),
-      sprints: []
+      sprints: [],
+      newName: "",
+      newID: ""
     };
   }
 
   handleChange = name => event => {
     this.setState({
-      workspace: {
-        ...this.state.workspace,
-        [name]: event.target.value
-      }
+      [name]: event.target.value
     });
   };
 
-  createSprint = (sprint) => {
+  createSprint = sprint => {
     db.collection("sprints")
       .add({ id: "sprint 1" })
       // .add({
@@ -56,9 +55,14 @@ class Workspace extends React.Component {
           );
 
         this.addSprintToWorkspace(docRef.id, sprint);
-        this.props.functions.load.sprint(docRef.id, () => this.setState({
-          sprints: [...this.state.sprints, this.props.sprints.find(s => s.id == docRef.id)]
-        }));
+        this.props.functions.load.sprint(docRef.id, () =>
+          this.setState({
+            sprints: [
+              ...this.state.sprints,
+              this.props.sprints.find(s => s.id == docRef.id)
+            ]
+          })
+        );
       });
   };
 
@@ -114,26 +118,45 @@ class Workspace extends React.Component {
     if (this.state.workspace.id == null) {
       return (
         <div>
-          <div>Create a new workspace!</div>
           <form
             onSubmit={event => {
               event.preventDefault();
-              console.log(this.state.workspace.name);
-              this.props.functions.create.workspace(this.state.workspace.name);
+              console.log(this.state.newName);
+              this.props.functions.create.workspace(this.state.newName);
             }}
           >
+            <div>Create a new workspace!</div>
             <TextField
               id="name"
               name="name"
-              placeholder="name"
+              label="Workspace Name"
               required={true}
-              label="name"
-              onChange={this.handleChange("name")}
+              onChange={this.handleChange("newName")}
               margin="normal"
               variant="outlined"
-              inputProps={{ name: this.state.workspace.name }}
+              inputProps={{ name: this.state.newName }}
             />
             <button>Create</button>
+          </form>
+          <form
+            onSubmit={event => {
+              event.preventDefault();
+              console.log(this.state.newID);
+              this.props.functions.add.workspace(this.state.newID);
+            }}
+          >
+            <div>Join a workspace!</div>
+            <TextField
+              id="id"
+              name="id"
+              required={true}
+              label="Workspace ID"
+              onChange={this.handleChange("newID")}
+              margin="normal"
+              variant="outlined"
+              inputProps={{ id: this.state.newID }}
+            />
+            <button>Join</button>
           </form>
         </div>
       );

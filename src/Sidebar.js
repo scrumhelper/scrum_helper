@@ -17,6 +17,7 @@ const Sidebar = ({ workspaces }) => {
         {workspaces.map((workspace, index) => (
           <WorkspaceElement key={index} workspace={workspace} />
         ))}
+        <WorkspaceElement workspace={{ id: "", name: "Create new" }} />
       </ul>
     </div>
   );
