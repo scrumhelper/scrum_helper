@@ -35,15 +35,6 @@ class Sprint extends React.Component {
     return (
       <div>
         <h1>Sprints</h1>
-        <ul id="sprints">
-          {this.props.sprints.map((s, index) => (
-            <div key={index}>
-              <Link to={`/workspace/${this.props.workspace.id}/${s.id}`}>
-                <p>{s.id}</p>
-              </Link>
-            </div>
-          ))}
-        </ul>
 
         {this.state.sprint.id == null && (
           <div>
@@ -54,6 +45,7 @@ class Sprint extends React.Component {
                 this.props.createSprint();
               }}
             >
+
               <button>create</button>
             </form>
           </div>
