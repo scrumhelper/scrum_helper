@@ -2,8 +2,17 @@ import React from "react";
 import firebase, { auth, db } from "./firebase";
 import { Link, Switch, Route } from "react-router-dom";
 import TextField from "@material-ui/core/TextField";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import { Menu } from "@material-ui/icons";
+import Sidebar from "./Sidebar";
+import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 
 import Sprint from "./Sprint";
+import SprintList from "./SprintList";
 
 class Workspace extends React.Component {
   constructor(props) {
@@ -12,9 +21,16 @@ class Workspace extends React.Component {
       workspace: this.newWorkspace(),
       sprints: [],
       newName: "",
-      newID: ""
+      newID: "",
+      left: false
     };
   }
+
+  toggleDrawer = (side, open) => {
+    this.setState({
+      [side]: open
+    });
+  };
 
   handleChange = name => event => {
     this.setState({
@@ -115,81 +131,123 @@ class Workspace extends React.Component {
   };
 
   render() {
-    if (this.state.workspace.id == null) {
-      return (
-        <div>
-          <form
-            onSubmit={event => {
-              event.preventDefault();
-              console.log(this.state.newName);
-              this.props.functions.create.workspace(this.state.newName);
-            }}
-          >
-            <div>Create a new workspace!</div>
-            <TextField
-              id="name"
-              name="name"
-              label="Workspace Name"
-              required={true}
-              onChange={this.handleChange("newName")}
-              margin="normal"
-              variant="outlined"
-              inputProps={{ name: this.state.newName }}
-            />
-            <button>Create</button>
-          </form>
-          <form
-            onSubmit={event => {
-              event.preventDefault();
-              console.log(this.state.newID);
-              this.props.functions.add.workspace(this.state.newID);
-            }}
-          >
-            <div>Join a workspace!</div>
-            <TextField
-              id="id"
-              name="id"
-              required={true}
-              label="Workspace ID"
-              onChange={this.handleChange("newID")}
-              margin="normal"
-              variant="outlined"
-              inputProps={{ id: this.state.newID }}
-            />
-            <button>Join</button>
-          </form>
-        </div>
-      );
-    }
     return (
-      <div>
-        <Switch>
-          <Route
-            path={`/workspace/${this.state.workspace.id}/:sid`}
-            render={navProps => (
-              <Sprint
-                functions={this.props.functions}
-                createSprint={this.createSprint}
-                workspace={this.state.workspace}
-                sprints={this.state.sprints}
-                {...navProps}
-              />
+      <div style={{backgroundColor: "#eee"}}>
+        <AppBar position="sticky">
+          <Toolbar style={{ backgroundColor: "black", color: "white" }}>
+            <IconButton
+              aria-label="Menu"
+              color="inherit"
+              style={{ marginLeft: -12, marginRight: 20 }}
+              onClick={() => this.toggleDrawer("left", true)}
+            >
+              <Menu />
+            </IconButton>
+            <Typography style={{ flexGrow: 1 }} color="inherit">
+              {this.state.workspace.id == null
+                ? "Scrum Helper"
+                : this.state.workspace.name}
+            </Typography>
+            {this.props.user == null ? (
+              <Button color="inherit">Login</Button>
+            ) : (
+              <Button color="inherit" onClick={() => this.props.signOut()}>
+                Sign out
+              </Button>
             )}
-          />
-          }
-          <Route
-            path={`/workspace/${this.state.workspace.id}`}
-            render={navProps => (
-              <Sprint
-                functions={this.props.functions}
-                createSprint={this.createSprint}
-                workspace={this.state.workspace}
-                sprints={this.state.sprints}
-                {...navProps}
+          </Toolbar>
+        </AppBar>
+        <SwipeableDrawer
+          open={this.state.left}
+          onClose={() => this.toggleDrawer("left", false)}
+          onOpen={() => this.toggleDrawer("left", true)}
+        >
+          <div
+            tabIndex={0}
+            role="button"
+            onClick={() => this.toggleDrawer("left", false)}
+            onKeyDown={() => this.toggleDrawer("left", false)}
+          >
+            <Sidebar
+              workspaces={this.props.workspaces}
+              close={() => this.toggleDrawer("left", false)}
+            />
+          </div>
+        </SwipeableDrawer>
+        {this.state.workspace.id == null ? (
+          <div>
+            <form
+              onSubmit={event => {
+                event.preventDefault();
+                console.log(this.state.newName);
+                this.props.functions.create.workspace(this.state.newName);
+              }}
+            >
+              <div>Create a new workspace!</div>
+              <TextField
+                id="name"
+                name="name"
+                label="Workspace Name"
+                required={true}
+                onChange={this.handleChange("newName")}
+                margin="normal"
+                variant="outlined"
+                inputProps={{ name: this.state.newName }}
               />
-            )}
-          />
-        </Switch>
+              <button>Create</button>
+            </form>
+            <form
+              onSubmit={event => {
+                event.preventDefault();
+                console.log(this.state.newID);
+                this.props.functions.add.workspace(this.state.newID);
+              }}
+            >
+              <div>Join a workspace!</div>
+              <TextField
+                id="id"
+                name="id"
+                required={true}
+                label="Workspace ID"
+                onChange={this.handleChange("newID")}
+                margin="normal"
+                variant="outlined"
+                inputProps={{ id: this.state.newID }}
+              />
+              <button>Join</button>
+            </form>
+          </div>
+        ) : (
+          <div>
+            <Switch>
+              <Route
+                path={`/workspace/${this.state.workspace.id}/:sid`}
+                render={navProps => (
+                  <Sprint
+                    functions={this.props.functions}
+                    createSprint={this.createSprint}
+                    workspace={this.state.workspace}
+                    sprints={this.state.sprints}
+                    {...navProps}
+                  />
+                )}
+              />
+              }
+              <Route
+                path={`/workspace/${this.state.workspace.id}`}
+                render={navProps => (
+                  <SprintList
+                    functions={this.props.functions}
+                    createSprint={this.createSprint}
+                    workspace={this.state.workspace}
+                    sprints={this.state.sprints}
+                    {...navProps}
+                  />
+                )}
+              />
+            </Switch>
+          </div>
+        )}
       </div>
     );
   }
