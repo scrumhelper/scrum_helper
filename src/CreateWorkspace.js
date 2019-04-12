@@ -14,13 +14,15 @@ import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Checkbox from "@material-ui/core/Checkbox";
 import Avatar from "@material-ui/core/Avatar";
 
+import FindUser from "./FindUser";
+import UserList from "./UserList";
+
 class CreateWorkspace extends React.Component {
   state = {
     newName: "",
     newID: "",
-    newUser: "",
     checked: [],
-    activeStep: 0,
+    activeStep: 0
   };
 
   handleChange = name => event => {
@@ -29,17 +31,8 @@ class CreateWorkspace extends React.Component {
     });
   };
 
-  handleToggle = id => {
-    const currentIndex = this.state.checked.indexOf(id);
-    const newChecked = [...this.state.checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(id);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-
-    this.setState({ checked: newChecked });
+  updateChecked = checked => {
+    this.setState({ checked });
   };
 
   getSteps = () => {
@@ -86,51 +79,12 @@ class CreateWorkspace extends React.Component {
       case 1:
         return (
           <div>
-            <List>
-              {this.props.globals.users.map((u, index) => (
-                <ListItem key={index} button>
-                  {/*<ListItemAvatar>
-                    <ListItemAvatar alt={`Avatar`} />
-                  </ListItemAvatar>*/}
-                  <ListItemText primary={u.name} />
-                  <ListItemSecondaryAction>
-                    <Checkbox
-                      onChange={() => this.handleToggle(u.id)}
-                      checked={this.state.checked.indexOf(u.id) !== -1}
-                    />
-                  </ListItemSecondaryAction>
-                </ListItem>
-              ))}
-            </List>
-            <div>
-              <div>
-                <TextField
-                  id="newUser"
-                  name="newUser"
-                  label="User id"
-                  required={true}
-                  onChange={this.handleChange("newUser")}
-                  margin="normal"
-                  variant="outlined"
-                  inputProps={{ newUser: this.state.newUser }}
-                />
-              </div>
-              <div style={{ paddingTop: 20, paddingBottom: 20 }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() =>
-                    this.props.functions.load.user(
-                      this.state.newUser,
-                      false,
-                    )
-                  }
-                >
-                  Search
-                </Button>
-              </div>
-            </div>
-
+            <UserList
+              checkable={true}
+              updateChecked={this.updateChecked}
+              users={this.props.globals.users}
+            />
+            <FindUser functions={this.props.functions} />
           </div>
         );
       case 2:
@@ -140,6 +94,10 @@ class CreateWorkspace extends React.Component {
               this.state.newName
             }`}</Typography>
             <Typography>{"Users"}</Typography>
+            <UserList
+              users={this.props.globals.users}
+              uids={this.state.checked}
+            />
           </div>
         );
     }
@@ -155,10 +113,11 @@ class CreateWorkspace extends React.Component {
               <StepLabel>{label}</StepLabel>
               <StepContent>
                 <div>
-                  <Typography>
-                    {this.getStepContent(this.state.activeStep)}
-                  </Typography>
+                  <div>{this.getStepContent(this.state.activeStep)}</div>
                   <div>
+                    <Button color="secondary" onClick={this.props.callback}>
+                      Cancel
+                    </Button>
                     <Button
                       disabled={this.state.activeStep === 0}
                       onClick={this.handleBack}
