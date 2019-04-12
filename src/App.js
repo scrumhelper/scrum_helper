@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
 
-import "./App.css";
 import firebase, { auth, db } from "./firebase";
 import SignIn from "./SignIn";
 import Main from "./Main";
@@ -37,7 +36,11 @@ class App extends Component {
       .get()
       .then(doc => {
         if (doc.exists) {
-          this.loadUser(uid, true, () => this.setState({ uid: uid }));
+          this.loadUser(
+            uid,
+            true,
+            success => success && this.setState({ uid: uid })
+          );
         } else {
           this.createUser(user);
           this.handleAuth(uid);
@@ -56,10 +59,10 @@ class App extends Component {
       });
   };
 
-  createWorkspace = name => {
+  createWorkspace = workspace => {
     db.collection("workspaces")
       .add({
-        name: name,
+        name: workspace.name,
         users: [this.state.uid],
         sprints: []
       })
@@ -89,32 +92,44 @@ class App extends Component {
     this.loadWorkspace(wid);
   };
 
-  loadDoc = (collection, id, callback) => {
+  loadDoc = (collection, id, success, error) => {
     db.collection(collection)
       .doc(id)
       .get()
       .then(doc => {
         if (doc.exists) {
-          callback(doc.data());
+          success(doc.data());
         } else {
           console.log(`No such document in ${collection} with id: ${id}`);
+          if(error) error(false);
         }
       })
-      .catch(error => console.error("Error in getting document: ", error));
+      .catch(error => {
+        console.error("Error in getting document: ", error);
+        if(error) error(false);
+      });
   };
 
   loadUser = (uid, complete, callback) => {
-    this.loadDoc("users", uid, user => {
-      if (complete)
-        this.setState({ user }, () => {
-          user.workspaces.forEach(wid => this.loadWorkspace(wid));
-          if (callback) callback();
-        });
-      else
-        this.setState({ users: [...this.state.users, user] }, () => {
-          if (callback) callback();
-        });
-    });
+    this.loadDoc(
+      "users",
+      uid,
+      user => {
+        if (complete)
+          this.setState({ user }, () => {
+            user.workspaces.forEach(wid => this.loadWorkspace(wid));
+            if (callback) callback(true);
+          });
+        else if (
+          uid !== this.state.uid &&
+          !this.state.users.find(u => u.id === uid)
+        )
+          this.setState({ users: [...this.state.users, user] }, () => {
+            if (callback) callback(true);
+          });
+      },
+      callback ? callback : undefined
+    );
   };
 
   loadWorkspace = wid => {
@@ -203,7 +218,7 @@ class App extends Component {
             }
           />
           <Route
-            path="/workspace"
+            path="/workspace/:wid?"
             render={navProps =>
               this.signedIn() ? (
                 <Main
@@ -227,9 +242,13 @@ class App extends Component {
                       workspace: this.addWorkspaceToUser
                     }
                   }}
-                  user={this.state.user}
-                  workspaces={this.state.workspaces}
-                  sprints={this.state.sprints}
+                  globals={{
+                    user: this.state.user,
+                    workspaces: this.state.workspaces,
+                    sprints: this.state.sprints,
+                    users: this.state.users
+                  }}
+                  {...navProps}
                 />
               ) : (
                 <Redirect to="/signin" />
