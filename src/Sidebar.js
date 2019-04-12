@@ -9,22 +9,12 @@ import { ChevronLeft } from "@material-ui/icons/";
 import IconButton from "@material-ui/core/IconButton";
 import ListItemText from "@material-ui/core/ListItemText";
 
-const WorkspaceElement = ({ workspace }) => {
-  return (
-    <Link to={`/workspace/${workspace.id}`}>
-      <ListItem button key={workspace.id}>
-        <ListItemText primary={workspace.name} />
-      </ListItem>
-    </Link>
-  );
-};
-
 const Sidebar = ({ workspaces, close }) => {
   return (
     <div className="Sidebar">
       <div>
         <IconButton onClick={close}>
-          <ChevronLeft/>
+          <ChevronLeft />
         </IconButton>
       </div>
       <Divider />
@@ -33,9 +23,17 @@ const Sidebar = ({ workspaces, close }) => {
           {workspaces
             .sort((a, b) => (a.name > b.name ? 1 : b.name < a.name ? -1 : 0))
             .map((workspace, index) => (
-              <WorkspaceElement key={index} workspace={workspace} />
+              <Link to={`/workspace/${workspace.id}`}>
+                <ListItem button key={workspace.id}>
+                  <ListItemText primary={workspace.name} />
+                </ListItem>
+              </Link>
             ))}
-          <WorkspaceElement workspace={{ id: "", name: "Create new" }} />
+          <Link to={`/workspace`}>
+            <ListItem button>
+              <ListItemText primary={"Create New"} />
+            </ListItem>
+          </Link>
         </ul>
       </List>
     </div>
