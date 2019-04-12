@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
+import Snackbar from "@material-ui/core/Snackbar";
+import IconButton from "@material-ui/core/IconButton";
+import Close from "@material-ui/icons/Close";
 
 import firebase, { auth, db } from "./firebase";
 import SignIn from "./SignIn";
@@ -11,7 +14,25 @@ class App extends Component {
     user: null,
     workspaces: [],
     sprints: [],
-    users: []
+    users: [],
+    snackOpen: false,
+    snackMessage: ""
+  };
+
+  throwSnackError = message => {
+    this.setState({ snackMessage: message }, this.openSnack);
+  };
+
+  openSnack = () => {
+    this.setState({
+      snackOpen: true
+    });
+  };
+
+  closeSnack = () => {
+    this.setState({
+      snackOpen: false
+    });
   };
 
   componentDidMount() {
@@ -101,12 +122,12 @@ class App extends Component {
           success(doc.data());
         } else {
           console.log(`No such document in ${collection} with id: ${id}`);
-          if(error) error(false);
+          if (error) error();
         }
       })
       .catch(error => {
         console.error("Error in getting document: ", error);
-        if(error) error(false);
+        if (error) error();
       });
   };
 
@@ -128,50 +149,73 @@ class App extends Component {
             if (callback) callback(true);
           });
       },
-      callback ? callback : undefined
+      () => {
+        this.throwSnackError(`Could not find user with id: ${uid}`);
+      }
     );
   };
 
   loadWorkspace = wid => {
-    this.loadDoc("workspaces", wid, ws => {
-      this.setState({
-        workspaces: [...this.state.workspaces.filter(w => w.id !== wid), ws]
-      });
-      ws.users.forEach(uid => this.loadUser(uid, false));
-      ws.sprints.forEach(sid => this.loadSprint(sid));
-    });
+    this.loadDoc(
+      "workspaces",
+      wid,
+      ws => {
+        this.setState({
+          workspaces: [...this.state.workspaces.filter(w => w.id !== wid), ws]
+        });
+        ws.users.forEach(uid => this.loadUser(uid, false));
+        ws.sprints.forEach(sid => this.loadSprint(sid));
+      },
+      () => {
+        this.throwSnackError(`Could not find workspace with id: ${wid}`);
+      }
+    );
   };
 
   loadSprint = (sid, callback) => {
-    this.loadDoc("sprints", sid, s => {
-      // s.events.sprintReview = new Date(s.events.sprintReview);
-      // s.events.dailyScrum = new Date(s.events.dailyScrum);
-      // s.events.sprintPlanning = new Date(s.events.sprintPlanning);
-      // s.events.sprintRetrospective = new Date(s.events.sprintRetrospective);
+    this.loadDoc(
+      "sprints",
+      sid,
+      s => {
+        // s.events.sprintReview = new Date(s.events.sprintReview);
+        // s.events.dailyScrum = new Date(s.events.dailyScrum);
+        // s.events.sprintPlanning = new Date(s.events.sprintPlanning);
+        // s.events.sprintRetrospective = new Date(s.events.sprintRetrospective);
 
-      this.setState(
-        {
-          sprints: [...this.state.sprints.filter(s => s.id !== sid), s]
-        },
-        callback
-      );
-    });
+        this.setState(
+          {
+            sprints: [...this.state.sprints.filter(s => s.id !== sid), s]
+          },
+          callback
+        );
+      },
+      () => {
+        this.throwSnackError(`Could not find sprint with id: ${sid}`);
+      }
+    );
   };
 
-  saveDoc = (collection, id, obj) => {
+  saveDoc = (collection, id, obj, error) => {
     db.collection(collection)
       .doc(id)
       .set(obj)
       .then(() => console.log("Document successfully written!"))
-      .catch(error => console.err("Error writing document: ", error));
+      .catch(err => {
+        console.err("Error writing document: ", error);
+        if (error) error();
+      });
   };
 
   saveUser = () => {
-    this.saveDoc("users", this.state.uid, this.state.user);
+    this.saveDoc("users", this.state.uid, this.state.user, () => {
+      this.throwSnackError(`Could not save user`);
+    });
   };
 
   saveWorkspace = workspace => {
-    this.saveDoc("workspaces", workspace.id, workspace);
+    this.saveDoc("workspaces", workspace.id, workspace, () => {
+      this.throwSnackError(`Could not save workspace`);
+    });
     this.setState({
       workspaces: [
         ...this.state.workspaces.filter(w => w.id !== workspace.id),
@@ -181,7 +225,9 @@ class App extends Component {
   };
 
   saveSprint = sprint => {
-    this.saveDoc("sprints", sprint.id, sprint);
+    this.saveDoc("sprints", sprint.id, sprint, () => {
+      this.throwSnackError(`Could not save sprint`);
+    });
     this.setState({
       sprints: [...this.state.sprints.filter(s => s.id !== sprint.id), sprint]
     });
@@ -265,6 +311,23 @@ class App extends Component {
             }
           />
         </Switch>
+        <Snackbar
+          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+          open={this.state.snackOpen}
+          autoHideDuration={6000}
+          onClose={this.closeSnack}
+          message={<span id="message-id">{this.state.snackMessage}</span>}
+          action={[
+            <IconButton
+              key="close"
+              aria-label="Close"
+              color="inherit"
+              onClick={this.closeSnack}
+            >
+              <Close />
+            </IconButton>
+          ]}
+        />
       </div>
     );
   }

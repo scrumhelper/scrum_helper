@@ -13,9 +13,6 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Checkbox from "@material-ui/core/Checkbox";
 import Avatar from "@material-ui/core/Avatar";
-import Snackbar from "@material-ui/core/Snackbar";
-import IconButton from "@material-ui/core/IconButton";
-import Close from "@material-ui/icons/Close";
 
 class CreateWorkspace extends React.Component {
   state = {
@@ -24,24 +21,11 @@ class CreateWorkspace extends React.Component {
     newUser: "",
     checked: [],
     activeStep: 0,
-    open: false
   };
 
   handleChange = name => event => {
     this.setState({
       [name]: event.target.value
-    });
-  };
-
-  handleOpen = () => {
-    this.setState({
-      open: true
-    });
-  };
-
-  handleClose = () => {
-    this.setState({
-      open: false
     });
   };
 
@@ -139,7 +123,6 @@ class CreateWorkspace extends React.Component {
                     this.props.functions.load.user(
                       this.state.newUser,
                       false,
-                      success => !success && this.handleOpen()
                     )
                   }
                 >
@@ -147,23 +130,7 @@ class CreateWorkspace extends React.Component {
                 </Button>
               </div>
             </div>
-            <Snackbar
-              anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-              open={this.state.open}
-              autoHideDuration={6000}
-              onClose={this.handleClose}
-              message={<span id="message-id">User Not Found</span>}
-              action={[
-                <IconButton
-                  key="close"
-                  aria-label="Close"
-                  color="inherit"
-                  onClick={this.handleClose}
-                >
-                  <Close />
-                </IconButton>
-              ]}
-            />
+
           </div>
         );
       case 2:
