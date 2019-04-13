@@ -234,11 +234,12 @@ class App extends Component {
             },
             { merge: true }
           );
-        this.addWorkspaceToUser(docRef.id);
+        workspace.users.forEach(u => this.addWorkspaceToUser(u, docRef.id));
+        this.addWorkspace(docRef.id);
       });
   };
 
-  addWorkspaceToUser = wid => {
+  addWorkspace = wid => {
     this.setState(
       {
         user: {
@@ -249,6 +250,19 @@ class App extends Component {
       this.saveUser
     );
     this.loadWorkspace(wid);
+  };
+
+  addWorkspaceToUser = (uid, wid) => {
+    const user = this.state.users.find(u => u.id === uid);
+    user.workspaces = [...user.workspaces, wid];
+    db.collection("users")
+      .doc(uid)
+      .set(
+        {
+          ...user
+        },
+        { merge: true }
+      );
   };
 
   loadDoc = (collection, id, success, error) => {
