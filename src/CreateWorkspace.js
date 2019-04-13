@@ -2,10 +2,6 @@ import React from "react";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
-import StepContent from "@material-ui/core/StepContent";
-import StepLabel from "@material-ui/core/StepLabel";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
@@ -13,9 +9,12 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Checkbox from "@material-ui/core/Checkbox";
 import Avatar from "@material-ui/core/Avatar";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Dialog from "@material-ui/core/Dialog";
 
 import FindUser from "./FindUser";
 import UserList from "./UserList";
+import Stepper from "./Stepper";
 
 class CreateWorkspace extends React.Component {
   state = {
@@ -106,50 +105,24 @@ class CreateWorkspace extends React.Component {
   render() {
     const steps = this.getSteps();
     return (
-      <div>
-        <Stepper orientation="vertical" activeStep={this.state.activeStep}>
-          {steps.map((label, index) => (
-            <Step key={index}>
-              <StepLabel>{label}</StepLabel>
-              <StepContent>
-                <div>
-                  <div>{this.getStepContent(this.state.activeStep)}</div>
-                  <div>
-                    <Button color="secondary" onClick={this.props.callback}>
-                      Cancel
-                    </Button>
-                    <Button
-                      disabled={this.state.activeStep === 0}
-                      onClick={this.handleBack}
-                    >
-                      Back
-                    </Button>
-                    <Button
-                      disabled={
-                        this.state.activeStep === 0 && this.state.newName === ""
-                      }
-                      color="primary"
-                      variant="contained"
-                      onClick={this.handleNext}
-                    >
-                      {this.state.activeStep === steps.length - 1
-                        ? "Create"
-                        : "Next"}
-                    </Button>
-                  </div>
-                </div>
-              </StepContent>
-            </Step>
-          ))}
-        </Stepper>
-        <div>
-          {this.state.activeStep === steps.length && (
-            <div>
-              <Typography>All steps completed</Typography>
-            </div>
-          )}
-        </div>
-      </div>
+      <Dialog onClose={this.props.handleClose} open={this.props.open}>
+        <DialogTitle id="Create Workspace">Create Workspace</DialogTitle>
+        <Stepper
+          getSteps={this.getSteps}
+          getStepContent={this.getStepContent}
+          continue={() =>
+            this.state.activeStep === 0 && this.state.newName === ""
+          }
+          finish={() => {
+            this.props.functions.create.workspace({
+              name: this.state.newName,
+              users: this.state.checked
+            });
+            this.props.handleClose();
+          }}
+          cancel={this.props.handleClose}
+        />
+      </Dialog>
     );
   }
 }

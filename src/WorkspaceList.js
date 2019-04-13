@@ -8,22 +8,7 @@ import { Link } from "react-router-dom";
 import Zoom from "@material-ui/core/Zoom";
 import Fab from "@material-ui/core/Fab";
 import { Add } from "@material-ui/icons";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Dialog from "@material-ui/core/Dialog";
 import CreateWorkspace from "./CreateWorkspace";
-
-function CreateWorkspaceDialog(props) {
-  return (
-    <Dialog onClose={props.handleClose} open={props.open}>
-      <DialogTitle id="Create Workspace">Create Workspace</DialogTitle>
-      <CreateWorkspace
-        functions={props.functions}
-        globals={props.globals}
-        callback={props.onClose}
-      />
-    </Dialog>
-  );
-}
 
 function WorkspaceCard(props) {
   return (
@@ -73,11 +58,11 @@ class WorkspaceList extends React.Component {
             <Add /> Create Workspace
           </Fab>
         </Zoom>
-        <CreateWorkspaceDialog
-          open={this.state.open}
+        <CreateWorkspace
           globals={this.props.globals}
           functions={this.props.functions}
-          onClose={this.handleClose}
+          handleClose={this.handleClose}
+          open={this.state.open}
         />
       </div>
     );
