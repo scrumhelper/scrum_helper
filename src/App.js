@@ -4,7 +4,8 @@ import Snackbar from "@material-ui/core/Snackbar";
 import IconButton from "@material-ui/core/IconButton";
 import Close from "@material-ui/icons/Close";
 
-import firebase, { auth, db } from "./firebase";
+import { serverKey } from "./config.js";
+import firebase, { auth, db, msg } from "./firebase";
 import SignIn from "./SignIn";
 import Main from "./Main";
 
@@ -48,7 +49,121 @@ class App extends Component {
         this.signOut();
       }
     });
+
+    msg.onTokenRefresh(() => {
+      msg
+        .getToken()
+        .then(refreshedToken => {
+          console.log("Token refreshed.");
+          // Indicate that the new Instance ID token has not yet been sent to the
+          // app server.
+          this.sendTokenToServer(false);
+          // Send Instance ID token to app server.
+          this.sendTokenToServer(refreshedToken);
+        })
+        .catch(function(err) {
+          console.log("Unable to retrieve refreshed token ", err);
+          // showToken("Unable to retrieve refreshed token ", err);
+        });
+    });
   }
+
+  requestMsgPermission = () => {
+    msg
+      .requestPermission()
+      .then(() => {
+        return msg.getToken();
+      })
+      .then(currentToken => {
+        if (currentToken) {
+          console.log("Valid token");
+          this.sendTokenToServer(currentToken);
+          // updateUIForPushEnabled(currentToken);
+        } else {
+          // Show permission request.
+          console.log(
+            "No Instance ID token available. Request permission to generate one."
+          );
+          // Show permission UI.
+          // updateUIForPushPermissionRequired();
+          this.sendTokenToServer(false);
+        }
+      })
+      .catch(err => {
+        console.log("An error occurred while retrieving token. ", err);
+        // showToken("Error retrieving Instance ID token. ", err);
+        this.sendTokenToServer(false);
+      });
+    // msg.requestPermission().then(() => {
+    //   msg
+    //     .getToken()
+    //     .then(function(currentToken) {
+    //       if (currentToken) {
+    //         console.log("Valid token");
+    //         this.sendTokenToServer(currentToken);
+    //         // updateUIForPushEnabled(currentToken);
+    //       } else {
+    //         // Show permission request.
+    //         console.log(
+    //           "No Instance ID token available. Request permission to generate one."
+    //         );
+    //         // Show permission UI.
+    //         // updateUIForPushPermissionRequired();
+    //         this.sendTokenToServer(false);
+    //       }
+    //     })
+    //     .catch(function(err) {
+    //       console.log("An error occurred while retrieving token. ", err);
+    //       // showToken("Error retrieving Instance ID token. ", err);
+    //       this.sendTokenToServer(false);
+    //     });
+    // });
+    // msg
+    //   .requestPermission()
+    //   .then(currentToken => {
+    //     console.log("Notification permission granted.", currentToken);
+    //     if (currentToken) {
+    //       this.sendTokenToServer(currentToken);
+    //       // updateUIForPushEnabled(currentToken);
+    //     } else {
+    //       console.log(
+    //         "No Instance ID token available. Request permission to generate one."
+    //       );
+    //       // Show permission UI.
+    //       // updateUIForPushPermissionRequired();
+    //       this.sendTokenToServer(false);
+    //     }
+    //   })
+    //   .catch(err => {
+    //     console.log("Unable to get permission to notify.", err);
+    //     // showToken("Error retrieving Instance ID token. ", err);
+    //     // setTokenSentToServer(false);
+    //   });
+  };
+
+  pushNotification = (to, title, body) => {
+    fetch("https://fcm.googleapis.com/fcm/send", {
+      method: "POST",
+      headers: {
+        Acccept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `key=${serverKey}`
+      },
+      body: JSON.stringify({
+        notification: {
+          title,
+          body,
+          click_action: "http://localhost:3000/",
+          icon: "http://url-to-an-icon/icon.png"
+        },
+        to
+      })
+    });
+  };
+
+  handleNotificationForeground = payload => {
+    console.log("Message received.", payload);
+  };
 
   handleAuth = uid => {
     const user = auth.currentUser;
@@ -57,11 +172,12 @@ class App extends Component {
       .get()
       .then(doc => {
         if (doc.exists) {
-          this.loadUser(
-            uid,
-            true,
-            success => success && this.setState({ uid: uid })
-          );
+          this.loadUser(uid, true, success => {
+            if (success) {
+              this.setState({ uid: uid });
+              this.requestMsgPermission();
+            }
+          });
         } else {
           this.createUser(user);
           this.handleAuth(uid);
@@ -80,11 +196,33 @@ class App extends Component {
       });
   };
 
+  sendTokenToServer = token => {
+    if (token) {
+      db.collection("users")
+        .doc(this.state.uid)
+        .set(
+          {
+            notificationToken: token
+          },
+          { merge: true }
+        );
+    } else {
+      db.collection("users")
+        .doc(this.state.uid)
+        .set(
+          {
+            notificationToken: firebase.firestore.FieldValue.delete()
+          },
+          { merge: true }
+        );
+    }
+  };
+
   createWorkspace = workspace => {
     db.collection("workspaces")
       .add({
         name: workspace.name,
-        users: [this.state.uid],
+        users: [this.state.uid, ...workspace.users],
         sprints: []
       })
       .then(docRef => {
