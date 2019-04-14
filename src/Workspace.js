@@ -8,22 +8,35 @@ import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import { Menu } from "@material-ui/icons";
-import Sidebar from "./Sidebar";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
+import Paper from "@material-ui/core/Paper";
 
+import Sidebar from "./Sidebar";
 import CreateWorkspace from "./CreateWorkspace";
 import Sprint from "./Sprint";
 import SprintList from "./SprintList";
+import UserList from "./UserList";
 
 class Workspace extends React.Component {
   render() {
     return (
-      <SprintList
-        functions={this.props.functions}
-        createSprint={this.createSprint}
-        workspace={this.props.workspace}
-        sprints={this.props.sprints}
-      />
+      <div>
+        <Paper>
+          <div style={{ padding: 20 }}>
+            <Typography variant="h5">Users</Typography>
+            <UserList
+              users={[...this.props.globals.users, this.props.globals.user]}
+            />
+            <Typography variant="h5">Sprints</Typography>
+            <SprintList
+              functions={this.props.functions}
+              createSprint={this.createSprint}
+              workspace={this.props.workspace}
+              sprints={this.props.sprints}
+            />
+          </div>
+        </Paper>
+      </div>
     );
   }
 }
