@@ -15,44 +15,24 @@ import Checkbox from "@material-ui/core/Checkbox";
 import Avatar from "@material-ui/core/Avatar";
 
 class Stepper extends React.Component {
-  state = {
-    activeStep: 0
-  };
-
-  handleNext = () => {
-    if (this.state.activeStep + 1 === this.props.getSteps().length) {
-      this.props.finish();
-    } else {
-      this.setState({
-        activeStep: this.state.activeStep + 1
-      });
-    }
-  };
-
-  handleBack = () => {
-    this.setState({
-      activeStep: this.state.activeStep - 1
-    });
-  };
-
   render() {
     const steps = this.props.getSteps();
     return (
       <div>
-        <StepperUI orientation="vertical" activeStep={this.state.activeStep}>
+        <StepperUI orientation="vertical" activeStep={this.props.activeStep}>
           {steps.map((label, index) => (
             <Step key={index}>
               <StepLabel>{label}</StepLabel>
               <StepContent>
                 <div>
-                  <div>{this.props.getStepContent(this.state.activeStep)}</div>
+                  <div>{this.props.getStepContent(this.props.activeStep)}</div>
                   <div>
                     <Button color="secondary" onClick={this.props.cancel}>
                       Cancel
                     </Button>
                     <Button
-                      disabled={this.state.activeStep === 0}
-                      onClick={this.handleBack}
+                      disabled={this.props.activeStep === 0}
+                      onClick={this.props.handleBack}
                     >
                       Back
                     </Button>
@@ -62,10 +42,10 @@ class Stepper extends React.Component {
                       }
                       color="primary"
                       variant="contained"
-                      onClick={this.handleNext}
+                      onClick={this.props.handleNext}
                     >
-                      {this.state.activeStep === steps.length - 1
-                        ? "Create"
+                      {this.props.activeStep === steps.length - 1
+                        ? "Finish"
                         : "Next"}
                     </Button>
                   </div>
@@ -75,7 +55,7 @@ class Stepper extends React.Component {
           ))}
         </StepperUI>
         <div>
-          {this.state.activeStep === steps.length && (
+          {this.props.activeStep === steps.length && (
             <div>
               <Typography>All steps completed</Typography>
             </div>

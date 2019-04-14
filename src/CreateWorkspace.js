@@ -19,10 +19,19 @@ import Stepper from "./Stepper";
 class CreateWorkspace extends React.Component {
   state = {
     newName: "",
-    newID: "",
     checked: [],
     activeStep: 0
   };
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.open === false && this.props.open === true) {
+      this.setState({
+        newName: "",
+        activeStep: 0,
+        checked: [],
+      });
+    }
+  }
 
   handleChange = name => event => {
     this.setState({
@@ -44,7 +53,7 @@ class CreateWorkspace extends React.Component {
         name: this.state.newName,
         users: this.state.checked
       });
-      this.props.callback();
+      this.props.handleClose();
     } else {
       this.setState({
         activeStep: this.state.activeStep + 1
@@ -113,13 +122,9 @@ class CreateWorkspace extends React.Component {
           continue={() =>
             this.state.activeStep === 0 && this.state.newName === ""
           }
-          finish={() => {
-            this.props.functions.create.workspace({
-              name: this.state.newName,
-              users: this.state.checked
-            });
-            this.props.handleClose();
-          }}
+          activeStep={this.state.activeStep}
+          handleNext={this.handleNext}
+          handleBack={this.handleBack}
           cancel={this.props.handleClose}
         />
       </Dialog>
