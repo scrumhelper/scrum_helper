@@ -23,7 +23,7 @@ const Sidebar = ({ workspaces, close }) => {
           {workspaces
             .sort((a, b) => (a.name > b.name ? 1 : b.name < a.name ? -1 : 0))
             .map((workspace, index) => (
-              <Link to={`/workspace/${workspace.id}`}>
+              <Link to={`/workspace/${workspace.id}`} key={index}>
                 <ListItem button key={workspace.id}>
                   <ListItemText primary={workspace.name} />
                 </ListItem>
