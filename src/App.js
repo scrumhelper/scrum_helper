@@ -277,8 +277,8 @@ class App extends Component {
           if (error) error();
         }
       })
-      .catch(error => {
-        console.error("Error in getting document: ", error);
+      .catch(err => {
+        console.error("Error in getting document: ", err);
         if (error) error();
       });
   };
@@ -307,16 +307,18 @@ class App extends Component {
     );
   };
 
-  loadWorkspace = wid => {
+  loadWorkspace = (wid, callback) => {
     this.loadDoc(
       "workspaces",
       wid,
       ws => {
+        const workspaces = this.state.workspaces.filter(w => w.id !== wid);
         this.setState({
-          workspaces: [...this.state.workspaces.filter(w => w.id !== wid), ws]
+          workspaces: [...workspaces, ws]
         });
         ws.users.forEach(uid => this.loadUser(uid, false));
         ws.sprints.forEach(sid => this.loadSprint(sid));
+        if (callback) callback(true);
       },
       () => {
         this.throwSnackError(`Could not find workspace with id: ${wid}`);
@@ -437,7 +439,7 @@ class App extends Component {
                       sprint: this.createSprint
                     },
                     add: {
-                      workspace: this.addWorkspaceToUser
+                      workspace: this.addWorkspace
                     }
                   }}
                   globals={{
