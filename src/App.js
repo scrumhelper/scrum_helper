@@ -249,20 +249,44 @@ class App extends Component {
       },
       this.saveUser
     );
-    this.loadWorkspace(wid);
+    this.addUserToWorkspace(this.state.uid, wid);
+  };
+
+  addUserToWorkspace = (uid, wid) => {
+    const ws = this.state.workspaces.find(w => w.id === wid);
+    ws.users = [...ws.users, uid];
+    this.saveDoc("workspaces", wid, ws, () =>
+      this.throwSnackError(
+        `Could not add user - ${uid} - to workspace - ${wid}`
+      )
+    );
   };
 
   addWorkspaceToUser = (uid, wid) => {
     const user = this.state.users.find(u => u.id === uid);
     user.workspaces = [...user.workspaces, wid];
-    db.collection("users")
-      .doc(uid)
-      .set(
-        {
-          ...user
+    this.saveDoc("users", uid, user, () =>
+      this.throwSnackError(`Could add workspace - ${wid} - to user ${uid}`)
+    );
+    this.addUserToWorkspace(this.state.uid, wid);
+  };
+
+  leaveWorkspace = wid => {
+    const ws = this.state.workspaces.find(w => w.id === wid);
+    ws.users = ws.users.filter(u => u !== this.state.uid);
+
+    this.saveWorkspace(ws);
+
+    this.setState(
+      {
+        user: {
+          ...this.state.user,
+          workspaces: this.state.user.workspaces.filter(w => w !== wid)
         },
-        { merge: true }
-      );
+        workspaces: [...this.state.workspaces.filter(w => w.id !== wid), ws]
+      },
+      this.saveUser
+    );
   };
 
   loadDoc = (collection, id, success, error) => {
@@ -318,7 +342,7 @@ class App extends Component {
         });
         ws.users.forEach(uid => this.loadUser(uid, false));
         ws.sprints.forEach(sid => this.loadSprint(sid));
-        if (callback) callback(true);
+        if (callback) callback(ws);
       },
       () => {
         this.throwSnackError(`Could not find workspace with id: ${wid}`);
@@ -440,6 +464,9 @@ class App extends Component {
                     },
                     add: {
                       workspace: this.addWorkspace
+                    },
+                    leave: {
+                      workspace: this.leaveWorkspace
                     }
                   }}
                   globals={{

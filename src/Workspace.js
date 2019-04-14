@@ -7,7 +7,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
-import { Menu } from "@material-ui/icons";
+import { Menu, ExitToApp } from "@material-ui/icons";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import Paper from "@material-ui/core/Paper";
 
@@ -24,6 +24,17 @@ class Workspace extends React.Component {
         <Paper>
           <div style={{ padding: 20 }}>
             <Typography variant="h5">Users</Typography>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => {
+                this.props.functions.leave.workspace(this.props.workspace.id);
+                this.props.history.goBack();
+              }}
+            >
+              <ExitToApp />
+              Leave Workspace
+            </Button>
             <UserList
               users={[...this.props.globals.users, this.props.globals.user]}
             />

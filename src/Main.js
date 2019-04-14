@@ -115,11 +115,15 @@ class Main extends React.Component {
             workspace: this.props.globals.workspaces.find(w => w.id === newID)
           },
           () => {
-            this.setState({
-              sprints: this.state.workspace.sprints.map(s =>
-                this.props.globals.sprints.find(sp => sp.id === s)
-              )
-            });
+            if (this.state.workspace !== null) {
+              this.setState({
+                sprints: this.state.workspace.sprints.map(s =>
+                  this.props.globals.sprints.find(sp => sp.id === s)
+                )
+              });
+            } else {
+              this.props.history.go("/workspace");
+            }
           }
         );
     }
