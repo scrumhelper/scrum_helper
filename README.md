@@ -1,5 +1,6 @@
 # Team
 William Eiffert: weiffert@purdue.edu
+
 Karl Gaernter: kgaertne@purdue.edu
 
 # Project
