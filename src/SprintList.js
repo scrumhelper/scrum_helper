@@ -51,13 +51,19 @@ class SprintList extends React.Component {
             justifyContent: "center"
           }}
         >
-          {this.props.sprints.map((s, index) => (
-            <SprintCard
-              key={index}
-              sprint={s}
-              workspace={this.props.workspace}
-            />
-          ))}
+          {this.props.sprints.length > 0 ? (
+            this.props.sprints.map((s, index) => (
+              <SprintCard
+                key={index}
+                sprint={s}
+                workspace={this.props.workspace}
+              />
+            ))
+          ) : (
+            <div>
+              <Typography>No sprints! Start a new one!</Typography>
+            </div>
+          )}
         </div>
         <Zoom in={true} style={{ position: "fixed", bottom: 20, right: 20 }}>
           <Fab variant="extended" color="primary" onClick={this.handleOpen}>
