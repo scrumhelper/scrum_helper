@@ -7,36 +7,32 @@ import Typography from "@material-ui/core/Typography";
 import { Link } from "react-router-dom";
 import Zoom from "@material-ui/core/Zoom";
 import Fab from "@material-ui/core/Fab";
-import { Add } from "@material-ui/icons";
-import CreateWorkspace from "./CreateWorkspace";
+import { Add, Create } from "@material-ui/icons";
 
-function WorkspaceCard(props) {
-  return (
-    <Card style={{ minWidth: 275, margin: 20 }}>
-      <CardContent>
-        <Typography>{`Workspace Name: ${props.workspace.name}`}</Typography>
-        <Typography>{`Workspace ID: ${props.workspace.id}`}</Typography>
-      </CardContent>
-      <CardActions>
-        <Link to={`/workspace/${props.workspace.id}`}>
-          <Button>View More</Button>
-        </Link>
-      </CardActions>
-    </Card>
-  );
-}
+import CreateWorkspace from "./CreateWorkspace";
+import JoinWorkspace from "./JoinWorkspace";
+import WorkspaceCard from "./WorkspaceCard";
 
 class WorkspaceList extends React.Component {
   state = {
-    open: false
+    create: false,
+    join: false
   };
 
-  handleOpen = () => {
-    this.setState({ open: true });
+  createWorkspace = () => {
+    this.setState({ create: true });
   };
 
-  handleClose = () => {
-    this.setState({ open: false });
+  joinWorkspace = () => {
+    this.setState({ join: true });
+  };
+
+  handleCloseJoin = () => {
+    this.setState({ join: false });
+  };
+
+  handleCloseCreate = () => {
+    this.setState({ create: false });
   };
 
   render() {
@@ -50,19 +46,48 @@ class WorkspaceList extends React.Component {
           }}
         >
           {this.props.globals.workspaces.map((w, index) => (
-            <WorkspaceCard key={index} workspace={w} />
+            <WorkspaceCard key={index} {...w} />
           ))}
         </div>
         <Zoom in={true} style={{ position: "fixed", bottom: 20, right: 20 }}>
-          <Fab variant="extended" color="primary" onClick={this.handleOpen}>
-            <Add /> Create Workspace
-          </Fab>
+          <div
+            style={{
+              display: "flex",
+              flex: 1,
+              flexDirection: "column",
+              flexWrap: "nowrap",
+              justifyContent: "right"
+            }}
+          >
+            <Fab
+              variant="extended"
+              color="primary"
+              onClick={this.joinWorkspace}
+              style={{ margin: 8 }}
+            >
+              <Add /> Join Workspace
+            </Fab>
+            <Fab
+              variant="extended"
+              color="primary"
+              onClick={this.createWorkspace}
+              style={{ margin: 8 }}
+            >
+              <Create /> Create Workspace
+            </Fab>
+          </div>
         </Zoom>
         <CreateWorkspace
           globals={this.props.globals}
           functions={this.props.functions}
-          handleClose={this.handleClose}
-          open={this.state.open}
+          handleClose={this.handleCloseCreate}
+          open={this.state.create}
+        />
+        <JoinWorkspace
+          globals={this.props.globals}
+          functions={this.props.functions}
+          handleClose={this.handleCloseJoin}
+          open={this.state.join}
         />
       </div>
     );
