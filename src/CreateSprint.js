@@ -10,10 +10,13 @@ import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Checkbox from "@material-ui/core/Checkbox";
 import Avatar from "@material-ui/core/Avatar";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
 import Dialog from "@material-ui/core/Dialog";
 import MenuItem from "@material-ui/core/MenuItem";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
+import Card from "@material-ui/core/Card";
+import Divider from "@material-ui/core/Divider";
 import Select from "@material-ui/core/Select";
 
 import FindUser from "./FindUser";
@@ -21,23 +24,79 @@ import UserList from "./UserList";
 import Stepper from "./Stepper";
 
 class CreateSprint extends React.Component {
-  state = {
-    activeStep: 0,
-    scrumMaster: null,
-    productOwner: null,
-    team: []
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      activeStep: 0,
+      scrumMaster: "",
+      productOwner: "",
+      team: [],
+      productBacklog: null,
+      sprintBacklog: null,
+      openSprintBacklog: false,
+      openProductBacklog: false
+    };
+
+    this.productBacklog = React.createRef();
+    this.sprintBacklog = React.createRef();
+  }
 
   componentDidUpdate(prevProps) {
     if (prevProps.open === false && this.props.open === true) {
       this.setState({
         activeStep: 0,
-        scrumMaster: null,
-        productOwner: null,
-        team: []
+        scrumMaster: "",
+        productOwner: "",
+        team: [],
+        productBacklog: null,
+        sprintBacklog: null
       });
     }
   }
+
+  openSprintBacklog = () => {
+    this.setState({
+      openSprintBacklog: true
+    });
+  };
+
+  handleSprintClose = () => {
+    this.setState({
+      openSprintBacklog: false
+    });
+  };
+
+  openProductBacklog = () => {
+    this.setState({
+      openProductBacklog: true
+    });
+  };
+
+  handleProductClose = () => {
+    this.setState({
+      openProductBacklog: false
+    });
+  };
+
+  updateProductBacklog = () => {
+    console.log(this.productBacklog);
+    this.setState(
+      {
+        productBacklog: this.productBacklog.current.files[0]
+      },
+      this.handleProductClose
+    );
+  };
+
+  updateSprintBacklog = () => {
+    console.log(this.sprintBacklog);
+    this.setState(
+      {
+        sprintBacklog: this.sprintBacklog.current.files[0]
+      },
+      this.handleSprintClose
+    );
+  };
 
   handleChange = event => {
     this.setState({
@@ -77,61 +136,76 @@ class CreateSprint extends React.Component {
     switch (step) {
       case 0:
         return (
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <FormControl variant="outlined" style={{ minWidth: 120 }}>
-              <InputLabel htmlFor="productOwner">Product Owner</InputLabel>
-              <Select
-                value={this.state.productOwner}
-                onChange={this.handleChange}
-                inputProps={{
-                  name: "productOwner",
-                  id: "productOwner"
-                }}
+          <Card style={{ margin: 10, padding: 20 }}>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <FormControl
+                variant="outlined"
+                style={{ minWidth: 120, margin: 5 }}
               >
-                {this.props.users.map(u => (
-                  <MenuItem value={u.id} key={u.id}>
-                    {u.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl style={{ minWidth: 120 }}>
-              <InputLabel htmlFor="scrumMaster">Scrum Master</InputLabel>
-              <Select
-                value={this.state.scrumMaster}
-                onChange={this.handleChange}
-                inputProps={{
-                  name: "scrumMaster",
-                  id: "scrumMaster"
-                }}
-              >
-                {this.props.users.map(u => (
-                  <MenuItem key={u.id} value={u.id}>
-                    {u.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <div>
-              <Typography variant="h5">Select Team Members</Typography>
-              <UserList
-                users={this.props.users}
-                checkable={true}
-                updateChecked={this.updateChecked}
-              />
+                <InputLabel htmlFor="productOwner">Product Owner</InputLabel>
+                <Select
+                  value={this.state.productOwner}
+                  onChange={this.handleChange}
+                  inputProps={{
+                    name: "productOwner",
+                    id: "productOwner"
+                  }}
+                >
+                  {this.props.users.map(u => (
+                    <MenuItem value={u.id} key={u.id}>
+                      {u.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl style={{ minWidth: 120, margin: 5 }}>
+                <InputLabel htmlFor="scrumMaster">Scrum Master</InputLabel>
+                <Select
+                  value={this.state.scrumMaster}
+                  onChange={this.handleChange}
+                  inputProps={{
+                    name: "scrumMaster",
+                    id: "scrumMaster"
+                  }}
+                >
+                  {this.props.users.map(u => (
+                    <MenuItem key={u.id} value={u.id}>
+                      {u.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <Divider style={{ marginTop: 10, marginBottom: 10 }} />
+              <div>
+                <Typography>Select Team Members</Typography>
+                <UserList
+                  users={this.props.users}
+                  checkable={true}
+                  updateChecked={this.updateChecked}
+                />
+              </div>
             </div>
-          </div>
+          </Card>
         );
       case 1:
-        return <div />;
+        return (
+          <Card style={{ margin: 10, padding: 20 }}>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <Button onClick={this.openProductBacklog}>
+                Upload Product Backlog
+              </Button>
+              <Button onClick={this.openSprintBacklog}>
+                Upload Sprint Backlog
+              </Button>
+            </div>
+          </Card>
+        );
       case 2:
         return <div />;
       case 3:
         return (
-          <div>
-            <Typography>{`Your new sprint: ${
-              this.state.newName
-            }`}</Typography>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Typography>{`Your new sprint: ${this.state.newName}`}</Typography>
             <Typography>{"Users"}</Typography>
             <UserList
               users={this.props.globals.users}
@@ -156,18 +230,51 @@ class CreateSprint extends React.Component {
           getSteps={this.getSteps}
           getStepContent={this.getStepContent}
           continue={() =>
-            this.state.scrumMaster === null ||
-            this.state.productOwner === null ||
-            this.state.team.length === 0
+            (this.state.activeStep === 0 &&
+              (this.state.scrumMaster === "" ||
+                this.state.productOwner === "" ||
+                this.state.team.length === 0)) ||
+            (this.state.activeStep === 1 &&
+              (this.productBacklog === null || this.sprintBacklog === null))
           }
           activeStep={this.state.activeStep}
           handleNext={this.handleNext}
           handleBack={this.handleBack}
           cancel={this.props.handleClose}
         />
+        <Dialog
+          open={this.state.openProductBacklog}
+          onClose={this.handleProductClose}
+        >
+          <DialogTitle>Upload Product Backlog</DialogTitle>
+          <DialogContent>
+            <input type="file" ref={this.productBacklog} />
+            <Button variant="contained" onClick={this.updateProductBacklog}>
+              Submit
+            </Button>
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          open={this.state.openSprintBacklog}
+          onClose={this.handleSprintClose}
+        >
+          <DialogTitle>Upload Sprint Backlog</DialogTitle>
+          <DialogContent>
+            <input type="file" ref={this.sprintBacklog} />
+            <Button variant="contained" onClick={this.updateSprintBacklog}>
+              Submit
+            </Button>
+          </DialogContent>
+        </Dialog>
       </Dialog>
     );
   }
+
+  handleSubmit = () => {
+    console.log(this.input);
+    console.log(this.productBacklog);
+    console.log(this.sprintBacklog);
+  };
 }
 
 export default CreateSprint;
