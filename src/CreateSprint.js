@@ -18,6 +18,13 @@ import FormControl from "@material-ui/core/FormControl";
 import Card from "@material-ui/core/Card";
 import Divider from "@material-ui/core/Divider";
 import Select from "@material-ui/core/Select";
+import Grid from "@material-ui/core/Grid";
+import DateFnsUtils from "@date-io/date-fns";
+import {
+  MuiPickersUtilsProvider,
+  TimePicker,
+  DatePicker
+} from "material-ui-pickers";
 
 import FindUser from "./FindUser";
 import UserList from "./UserList";
@@ -34,7 +41,11 @@ class CreateSprint extends React.Component {
       productBacklog: null,
       sprintBacklog: null,
       openSprintBacklog: false,
-      openProductBacklog: false
+      openProductBacklog: false,
+      sprintReview: new Date(),
+      sprintRetrospective: new Date(),
+      sprintPlanning: new Date(),
+      dailyScrum: new Date()
     };
 
     this.productBacklog = React.createRef();
@@ -43,13 +54,22 @@ class CreateSprint extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.open === false && this.props.open === true) {
+      const dates = [];
+      for (let i = 0; i < 4; i++) {
+        dates.push(new Date());
+        dates[i].setMinutes(0, 0, 0);
+      }
       this.setState({
         activeStep: 0,
         scrumMaster: "",
         productOwner: "",
         team: [],
         productBacklog: null,
-        sprintBacklog: null
+        sprintBacklog: null,
+        sprintReview: dates[0],
+        sprintRetrospective: dates[1],
+        sprintPlanning: dates[2],
+        dailyScrum: dates[3]
       });
     }
   }
@@ -79,29 +99,35 @@ class CreateSprint extends React.Component {
   };
 
   updateProductBacklog = () => {
-    console.log(this.productBacklog);
+    // console.log(this.productBacklog);
     this.setState(
       {
         productBacklog: this.productBacklog.current.files[0]
       },
       this.handleProductClose
     );
+    // console.log(this.productBacklog.current.files[0]);
   };
 
   updateSprintBacklog = () => {
-    console.log(this.sprintBacklog);
+    // console.log(this.sprintBacklog);
     this.setState(
       {
         sprintBacklog: this.sprintBacklog.current.files[0]
       },
       this.handleSprintClose
     );
+    // console.log(this.sprintBacklog.current.files[0]);
   };
 
   handleChange = event => {
     this.setState({
       [event.target.name]: event.target.value
     });
+  };
+
+  handleDateChange = (name, date) => {
+    this.setState({ [name]: date });
   };
 
   updateChecked = checked => {
@@ -201,7 +227,92 @@ class CreateSprint extends React.Component {
           </Card>
         );
       case 2:
-        return <div />;
+        return (
+          <div>
+            <Card style={{ margin: 10, padding: 20 }}>
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <Typography>Sprint Planning</Typography>
+                <Grid container justify="space-around">
+                  <DatePicker
+                    margin="normal"
+                    label="Date picker"
+                    value={this.state.sprintPlanning}
+                    onChange={date =>
+                      this.handleDateChange("sprintPlanning", date)
+                    }
+                  />
+                  <TimePicker
+                    margin="normal"
+                    label="Time picker"
+                    value={this.state.sprintPlanning}
+                    onChange={date =>
+                      this.handleDateChange("sprintPlanning", date)
+                    }
+                  />
+                </Grid>
+              </MuiPickersUtilsProvider>
+            </Card>
+            <Card style={{ margin: 10, padding: 20 }}>
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <Typography>Daily Scrum</Typography>
+                <Grid container justify="space-around">
+                  <TimePicker
+                    margin="normal"
+                    label="Time picker"
+                    value={this.state.dailyScrum}
+                    onChange={date => this.handleDateChange("dailyScrum", date)}
+                  />
+                </Grid>
+              </MuiPickersUtilsProvider>
+            </Card>
+            <Card style={{ margin: 10, padding: 20 }}>
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <Typography>Sprint Review</Typography>
+                <Grid container justify="space-around">
+                  <DatePicker
+                    margin="normal"
+                    label="Date picker"
+                    value={this.state.sprintReview}
+                    onChange={date =>
+                      this.handleDateChange("sprintReview", date)
+                    }
+                  />
+                  <TimePicker
+                    margin="normal"
+                    label="Time picker"
+                    value={this.state.sprintReview}
+                    onChange={date =>
+                      this.handleDateChange("sprintReview", date)
+                    }
+                  />
+                </Grid>
+              </MuiPickersUtilsProvider>
+            </Card>
+            <Card style={{ margin: 10, padding: 20 }}>
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <Typography>Sprint Retrospective</Typography>
+                <Grid container justify="space-around">
+                  <DatePicker
+                    margin="normal"
+                    label="Date picker"
+                    value={this.state.sprintRetrospective}
+                    onChange={date =>
+                      this.handleDateChange("sprintRetrospective", date)
+                    }
+                  />
+                  <TimePicker
+                    margin="normal"
+                    label="Time picker"
+                    value={this.state.sprintRetrospective}
+                    onChange={date =>
+                      this.handleDateChange("sprintRetrospective", date)
+                    }
+                  />
+                </Grid>
+              </MuiPickersUtilsProvider>
+            </Card>
+          </div>
+        );
       case 3:
         return (
           <div style={{ display: "flex", flexDirection: "column" }}>
@@ -229,13 +340,18 @@ class CreateSprint extends React.Component {
         <Stepper
           getSteps={this.getSteps}
           getStepContent={this.getStepContent}
-          continue={() =>
+          continueDisabled={() =>
             (this.state.activeStep === 0 &&
               (this.state.scrumMaster === "" ||
                 this.state.productOwner === "" ||
                 this.state.team.length === 0)) ||
             (this.state.activeStep === 1 &&
-              (this.productBacklog === null || this.sprintBacklog === null))
+              (this.state.productBacklog === null ||
+                this.state.sprintBacklog === null)) ||
+            (this.state.activeStep === 2 &&
+              (this.state.sprintPlanning.getTime() >= this.state.sprintReview.getTime() ||
+                this.state.sprintPlanning.getTime() >= this.state.sprintRetrospective.getTime() ||
+                this.state.sprintReview.getTime() >= this.state.sprintRetrospective.getTime()))
           }
           activeStep={this.state.activeStep}
           handleNext={this.handleNext}
