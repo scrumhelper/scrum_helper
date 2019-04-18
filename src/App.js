@@ -192,7 +192,8 @@ class App extends Component {
         name: user.displayName,
         email: user.email,
         id: user.uid,
-        workspaces: []
+        workspaces: [],
+        photo: user.photoURL
       });
   };
 
@@ -233,9 +234,15 @@ class App extends Component {
               id: docRef.id
             },
             { merge: true }
+          )
+          .then(() =>
+            this.loadWorkspace(docRef.id, () => {
+              workspace.users.forEach(u =>
+                this.addWorkspaceToUser(u, docRef.id)
+              );
+              this.addWorkspace(docRef.id);
+            })
           );
-        workspace.users.forEach(u => this.addWorkspaceToUser(u, docRef.id));
-        this.addWorkspace(docRef.id);
       });
   };
 
@@ -247,9 +254,11 @@ class App extends Component {
           workspaces: [...this.state.user.workspaces, wid]
         }
       },
-      this.saveUser
+      () => {
+        this.saveUser();
+        this.addUserToWorkspace(this.state.uid, wid);
+      }
     );
-    this.addUserToWorkspace(this.state.uid, wid);
   };
 
   addUserToWorkspace = (uid, wid) => {
@@ -268,7 +277,7 @@ class App extends Component {
     this.saveDoc("users", uid, user, () =>
       this.throwSnackError(`Could add workspace - ${wid} - to user ${uid}`)
     );
-    this.addUserToWorkspace(this.state.uid, wid);
+    // this.addUserToWorkspace(this.state.uid, wid);
   };
 
   leaveWorkspace = wid => {
@@ -287,6 +296,10 @@ class App extends Component {
       },
       this.saveUser
     );
+  };
+
+  createSprint = sprint => {
+    console.log(sprint);
   };
 
   loadDoc = (collection, id, success, error) => {
@@ -425,6 +438,10 @@ class App extends Component {
       users: []
     });
     auth.signOut();
+  };
+
+  uploadFile = path => {
+    console.log(path);
   };
 
   render() {

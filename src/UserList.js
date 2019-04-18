@@ -45,9 +45,9 @@ class UserList extends React.Component {
         <List>
           {list.map((u, index) => (
             <ListItem key={index} button>
-              {/*<ListItemAvatar>
-                    <ListItemAvatar alt={`Avatar`} />
-                  </ListItemAvatar>*/}
+              <ListItemAvatar>
+                <Avatar alt={`Avatar`} src={u.photo} />
+              </ListItemAvatar>
               <ListItemText primary={u.name} />
               {this.props.checkable && (
                 <ListItemSecondaryAction>

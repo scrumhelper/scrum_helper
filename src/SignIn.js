@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Route, Link } from "react-router-dom";
 import firebaseui from "firebaseui";
-import { auth, githubAuthProvider } from "./firebase";
+import { auth, googleAuthProvider } from "./firebase";
 import "./SignIn.css";
 
 class SignIn extends Component {
@@ -26,7 +26,7 @@ class SignIn extends Component {
         <div>
           <div>
             <h1>Scrum Helper</h1>
-            <button onClick={() => this.auth(githubAuthProvider)}>
+            <button onClick={() => this.auth(googleAuthProvider)}>
               <p>Sign In</p>
             </button>
           </div>

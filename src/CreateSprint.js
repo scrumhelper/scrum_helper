@@ -141,8 +141,17 @@ class CreateSprint extends React.Component {
   handleNext = () => {
     if (this.state.activeStep + 1 === this.getSteps().length) {
       this.props.functions.create.sprint({
-        name: this.state.newName,
-        users: this.state.checked
+        scrumMaster: this.state.scrumMaster,
+        productOwner: this.state.productOwner,
+        team: this.state.team,
+        productBacklog: this.state.productBacklog,
+        sprintBacklog: this.state.sprintBacklog,
+        openSprintBacklog: this.state.openSprintBacklog,
+        openProductBacklog: this.state.openProductBacklog,
+        sprintReview: this.state.sprintReview,
+        sprintRetrospective: this.state.sprintRetrospective,
+        sprintPlanning: this.state.sprintPlanning,
+        dailyScrum: this.state.dailyScrum,
       });
       this.props.handleClose();
     } else {
@@ -349,9 +358,12 @@ class CreateSprint extends React.Component {
               (this.state.productBacklog === null ||
                 this.state.sprintBacklog === null)) ||
             (this.state.activeStep === 2 &&
-              (this.state.sprintPlanning.getTime() >= this.state.sprintReview.getTime() ||
-                this.state.sprintPlanning.getTime() >= this.state.sprintRetrospective.getTime() ||
-                this.state.sprintReview.getTime() >= this.state.sprintRetrospective.getTime()))
+              (this.state.sprintPlanning.getTime() >=
+                this.state.sprintReview.getTime() ||
+                this.state.sprintPlanning.getTime() >=
+                  this.state.sprintRetrospective.getTime() ||
+                this.state.sprintReview.getTime() >=
+                  this.state.sprintRetrospective.getTime()))
           }
           activeStep={this.state.activeStep}
           handleNext={this.handleNext}

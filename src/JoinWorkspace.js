@@ -110,7 +110,7 @@ class JoinWorkspace extends React.Component {
           handleNext={this.handleNext}
           handleBack={this.handleBack}
           activeStep={this.state.activeStep}
-          continue={() =>
+          continueDisabled={() =>
             this.state.activeStep === 0 && this.state.newID === ""
           }
           cancel={this.props.handleClose}

@@ -119,7 +119,7 @@ class CreateWorkspace extends React.Component {
         <Stepper
           getSteps={this.getSteps}
           getStepContent={this.getStepContent}
-          continue={() =>
+          continueDisabled={() =>
             this.state.activeStep === 0 && this.state.newName === ""
           }
           activeStep={this.state.activeStep}
