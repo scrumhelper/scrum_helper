@@ -38,7 +38,7 @@ class Stepper extends React.Component {
                     </Button>
                     <Button
                       disabled={
-                        this.props.continue()
+                        this.props.continueDisabled()
                       }
                       color="primary"
                       variant="contained"

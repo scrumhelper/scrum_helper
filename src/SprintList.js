@@ -5,10 +5,6 @@ import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import { Link } from "react-router-dom";
-import Zoom from "@material-ui/core/Zoom";
-import Fab from "@material-ui/core/Fab";
-import { Add } from "@material-ui/icons";
-import CreateSprint from "./CreateSprint";
 
 function SprintCard(props) {
   return (
@@ -29,53 +25,28 @@ function SprintCard(props) {
 }
 
 class SprintList extends React.Component {
-  state = {
-    open: false
-  };
-
-  handleOpen = () => {
-    this.setState({ open: true });
-  };
-
-  handleClose = () => {
-    this.setState({ open: false });
-  };
-
   render() {
     return (
-      <div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center"
-          }}
-        >
-          {this.props.sprints.length > 0 ? (
-            this.props.sprints.map((s, index) => (
-              <SprintCard
-                key={index}
-                sprint={s}
-                workspace={this.props.workspace}
-              />
-            ))
-          ) : (
-            <div>
-              <Typography>No sprints! Start a new one!</Typography>
-            </div>
-          )}
-        </div>
-        <Zoom in={true} style={{ position: "fixed", bottom: 20, right: 20 }}>
-          <Fab variant="extended" color="primary" onClick={this.handleOpen}>
-            <Add /> Create Sprint
-          </Fab>
-        </Zoom>
-        <CreateSprint
-          globals={this.props.globals}
-          functions={this.props.functions}
-          handleClose={this.handleClose}
-          open={this.state.open}
-        />
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center"
+        }}
+      >
+        {this.props.sprints.length > 0 ? (
+          this.props.sprints.map((s, index) => (
+            <SprintCard
+              key={index}
+              sprint={s}
+              workspace={this.props.workspace}
+            />
+          ))
+        ) : (
+          <div>
+            <Typography>No sprints! Start a new one!</Typography>
+          </div>
+        )}
       </div>
     );
   }

@@ -197,6 +197,10 @@ class Main extends React.Component {
                   createSprint={this.createSprint}
                   workspace={this.state.workspace}
                   sprints={this.state.sprints}
+                  users={[
+                    ...this.props.globals.users,
+                    this.props.globals.user
+                  ].filter(u => this.state.workspace.users.find(v => v  === u.id))}
                   {...navProps}
                 />
               )}
