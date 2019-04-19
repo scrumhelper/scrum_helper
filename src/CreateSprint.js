@@ -26,6 +26,7 @@ import {
   DatePicker
 } from "material-ui-pickers";
 
+import Calendar from "./Calendar";
 import FindUser from "./FindUser";
 import UserList from "./UserList";
 import Stepper from "./Stepper";
@@ -60,7 +61,7 @@ class CreateSprint extends React.Component {
         dates[i].setMinutes(0, 0, 0);
       }
       this.setState({
-        activeStep: 0,
+        activeStep: 2,
         scrumMaster: "",
         productOwner: "",
         team: [],
@@ -151,7 +152,7 @@ class CreateSprint extends React.Component {
         sprintReview: this.state.sprintReview,
         sprintRetrospective: this.state.sprintRetrospective,
         sprintPlanning: this.state.sprintPlanning,
-        dailyScrum: this.state.dailyScrum,
+        dailyScrum: this.state.dailyScrum
       });
       this.props.handleClose();
     } else {
@@ -238,88 +239,135 @@ class CreateSprint extends React.Component {
       case 2:
         return (
           <div>
-            <Card style={{ margin: 10, padding: 20 }}>
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <Typography>Sprint Planning</Typography>
-                <Grid container justify="space-around">
-                  <DatePicker
-                    margin="normal"
-                    label="Date picker"
-                    value={this.state.sprintPlanning}
-                    onChange={date =>
-                      this.handleDateChange("sprintPlanning", date)
-                    }
-                  />
-                  <TimePicker
-                    margin="normal"
-                    label="Time picker"
-                    value={this.state.sprintPlanning}
-                    onChange={date =>
-                      this.handleDateChange("sprintPlanning", date)
-                    }
-                  />
-                </Grid>
-              </MuiPickersUtilsProvider>
-            </Card>
-            <Card style={{ margin: 10, padding: 20 }}>
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <Typography>Daily Scrum</Typography>
-                <Grid container justify="space-around">
-                  <TimePicker
-                    margin="normal"
-                    label="Time picker"
-                    value={this.state.dailyScrum}
-                    onChange={date => this.handleDateChange("dailyScrum", date)}
-                  />
-                </Grid>
-              </MuiPickersUtilsProvider>
-            </Card>
-            <Card style={{ margin: 10, padding: 20 }}>
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <Typography>Sprint Review</Typography>
-                <Grid container justify="space-around">
-                  <DatePicker
-                    margin="normal"
-                    label="Date picker"
-                    value={this.state.sprintReview}
-                    onChange={date =>
-                      this.handleDateChange("sprintReview", date)
-                    }
-                  />
-                  <TimePicker
-                    margin="normal"
-                    label="Time picker"
-                    value={this.state.sprintReview}
-                    onChange={date =>
-                      this.handleDateChange("sprintReview", date)
-                    }
-                  />
-                </Grid>
-              </MuiPickersUtilsProvider>
-            </Card>
-            <Card style={{ margin: 10, padding: 20 }}>
-              <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <Typography>Sprint Retrospective</Typography>
-                <Grid container justify="space-around">
-                  <DatePicker
-                    margin="normal"
-                    label="Date picker"
-                    value={this.state.sprintRetrospective}
-                    onChange={date =>
-                      this.handleDateChange("sprintRetrospective", date)
-                    }
-                  />
-                  <TimePicker
-                    margin="normal"
-                    label="Time picker"
-                    value={this.state.sprintRetrospective}
-                    onChange={date =>
-                      this.handleDateChange("sprintRetrospective", date)
-                    }
-                  />
-                </Grid>
-              </MuiPickersUtilsProvider>
-            </Card>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <div>
+                <Calendar
+                  dates={[
+                    this.state.sprintPlanning,
+                    this.state.sprintReview,
+                    this.state.sprintRetrospective
+                  ]}
+                />
+              </div>
+              <div>
+                <Card
+                  style={{
+                    margin: 10,
+                    padding: 20,
+                    borderWidth: 3,
+                    borderStyle: "solid",
+                    borderColor: "#0000cc"
+                  }}
+                >
+                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <Typography>Sprint Planning</Typography>
+                    <Grid container justify="space-around">
+                      <DatePicker
+                        margin="normal"
+                        label="Date picker"
+                        value={this.state.sprintPlanning}
+                        onChange={date =>
+                          this.handleDateChange("sprintPlanning", date)
+                        }
+                      />
+                      <TimePicker
+                        margin="normal"
+                        label="Time picker"
+                        value={this.state.sprintPlanning}
+                        onChange={date =>
+                          this.handleDateChange("sprintPlanning", date)
+                        }
+                      />
+                    </Grid>
+                  </MuiPickersUtilsProvider>
+                </Card>
+                <Card
+                  style={{
+                    margin: 10,
+                    padding: 20,
+                    borderWidth: 3,
+                    borderStyle: "solid",
+                    borderColor: "#000000"
+                  }}
+                >
+                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <Typography>Daily Scrum</Typography>
+                    <Grid container justify="space-around">
+                      <TimePicker
+                        margin="normal"
+                        label="Time picker"
+                        value={this.state.dailyScrum}
+                        onChange={date =>
+                          this.handleDateChange("dailyScrum", date)
+                        }
+                      />
+                    </Grid>
+                  </MuiPickersUtilsProvider>
+                </Card>
+                <Card
+                  style={{
+                    margin: 10,
+                    padding: 20,
+                    borderWidth: 3,
+                    borderStyle: "solid",
+                    borderColor: "#cc0000"
+                  }}
+                >
+                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <Typography>Sprint Review</Typography>
+                    <Grid container justify="space-around">
+                      <DatePicker
+                        margin="normal"
+                        label="Date picker"
+                        value={this.state.sprintReview}
+                        onChange={date =>
+                          this.handleDateChange("sprintReview", date)
+                        }
+                      />
+                      <TimePicker
+                        margin="normal"
+                        label="Time picker"
+                        value={this.state.sprintReview}
+                        onChange={date =>
+                          this.handleDateChange("sprintReview", date)
+                        }
+                      />
+                    </Grid>
+                  </MuiPickersUtilsProvider>
+                </Card>
+                <Card
+                  style={{
+                    margin: 10,
+                    padding: 20,
+                    borderWidth: 3,
+                    borderStyle: "solid",
+                    borderColor: "#00cc00"
+                  }}
+                >
+                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <Typography>Sprint Retrospective</Typography>
+                    <Grid container justify="space-around">
+                      <DatePicker
+                        margin="normal"
+                        label="Date picker"
+                        value={this.state.sprintRetrospective}
+                        onChange={date =>
+                          this.handleDateChange("sprintRetrospective", date)
+                        }
+                      />
+                      <TimePicker
+                        margin="normal"
+                        label="Time picker"
+                        value={this.state.sprintRetrospective}
+                        onChange={date =>
+                          this.handleDateChange("sprintRetrospective", date)
+                        }
+                      />
+                    </Grid>
+                  </MuiPickersUtilsProvider>
+                </Card>
+              </div>
+            </div>
           </div>
         );
       case 3:
