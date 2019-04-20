@@ -30,6 +30,7 @@ import Calendar from "./Calendar";
 import FindUser from "./FindUser";
 import UserList from "./UserList";
 import Stepper from "./Stepper";
+import Sprint from "./Sprint";
 
 class CreateSprint extends React.Component {
   constructor(props) {
@@ -142,6 +143,7 @@ class CreateSprint extends React.Component {
   handleNext = () => {
     if (this.state.activeStep + 1 === this.getSteps().length) {
       this.props.functions.create.sprint({
+        name: `Sprint ${this.props.workspace.sprints.length + 2}`,
         scrumMaster: this.state.scrumMaster,
         productOwner: this.state.productOwner,
         team: this.state.team,
@@ -260,11 +262,10 @@ class CreateSprint extends React.Component {
                   }}
                 >
                   <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <Typography>Sprint Planning</Typography>
                     <Grid container justify="space-around">
                       <DatePicker
                         margin="normal"
-                        label="Date picker"
+                        label="Sprint Planning Date"
                         value={this.state.sprintPlanning}
                         onChange={date =>
                           this.handleDateChange("sprintPlanning", date)
@@ -272,7 +273,7 @@ class CreateSprint extends React.Component {
                       />
                       <TimePicker
                         margin="normal"
-                        label="Time picker"
+                        label="Sprint Planning Time"
                         value={this.state.sprintPlanning}
                         onChange={date =>
                           this.handleDateChange("sprintPlanning", date)
@@ -291,11 +292,10 @@ class CreateSprint extends React.Component {
                   }}
                 >
                   <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <Typography>Daily Scrum</Typography>
                     <Grid container justify="space-around">
                       <TimePicker
                         margin="normal"
-                        label="Time picker"
+                        label="Daily Scrum Time"
                         value={this.state.dailyScrum}
                         onChange={date =>
                           this.handleDateChange("dailyScrum", date)
@@ -314,11 +314,10 @@ class CreateSprint extends React.Component {
                   }}
                 >
                   <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <Typography>Sprint Review</Typography>
                     <Grid container justify="space-around">
                       <DatePicker
                         margin="normal"
-                        label="Date picker"
+                        label="Sprint Review Date"
                         value={this.state.sprintReview}
                         onChange={date =>
                           this.handleDateChange("sprintReview", date)
@@ -326,7 +325,7 @@ class CreateSprint extends React.Component {
                       />
                       <TimePicker
                         margin="normal"
-                        label="Time picker"
+                        label="Sprint Review Time"
                         value={this.state.sprintReview}
                         onChange={date =>
                           this.handleDateChange("sprintReview", date)
@@ -345,11 +344,10 @@ class CreateSprint extends React.Component {
                   }}
                 >
                   <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <Typography>Sprint Retrospective</Typography>
                     <Grid container justify="space-around">
                       <DatePicker
                         margin="normal"
-                        label="Date picker"
+                        label="Sprint Retrospective Date"
                         value={this.state.sprintRetrospective}
                         onChange={date =>
                           this.handleDateChange("sprintRetrospective", date)
@@ -357,7 +355,7 @@ class CreateSprint extends React.Component {
                       />
                       <TimePicker
                         margin="normal"
-                        label="Time picker"
+                        label="Sprint Retrospective Time"
                         value={this.state.sprintRetrospective}
                         onChange={date =>
                           this.handleDateChange("sprintRetrospective", date)
@@ -442,6 +440,7 @@ class CreateSprint extends React.Component {
             </Button>
           </DialogContent>
         </Dialog>
+        <Sprint {...this.state} users={this.props.users} workspace={this.props.workspace} />
       </Dialog>
     );
   }
