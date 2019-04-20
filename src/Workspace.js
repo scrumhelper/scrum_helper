@@ -37,32 +37,28 @@ class Workspace extends React.Component {
   render() {
     return (
       <div>
-        <Paper>
-          <div style={{ padding: 20 }}>
-            <Typography variant="h5">Users</Typography>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => {
-                this.props.functions.leave.workspace(this.props.workspace.id);
-                this.props.history.goBack();
-              }}
-            >
-              <ExitToApp />
-              Leave Workspace
-            </Button>
-            <UserList
-              users={this.props.users}
-            />
-            <Typography variant="h5">Sprints</Typography>
-            <SprintList
-              functions={this.props.functions}
-              createSprint={this.createSprint}
-              workspace={this.props.workspace}
-              sprints={this.props.sprints}
-            />
-          </div>
-        </Paper>
+        <div style={{ padding: 20 }}>
+          <Typography variant="h5">Users</Typography>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => {
+              this.props.functions.leave.workspace(this.props.workspace.id);
+              this.props.history.goBack();
+            }}
+          >
+            <ExitToApp />
+            Leave Workspace
+          </Button>
+          <UserList users={this.props.users} />
+          <Typography variant="h5">Sprints</Typography>
+          <SprintList
+            functions={this.props.functions}
+            createSprint={this.createSprint}
+            workspace={this.props.workspace}
+            sprints={this.props.sprints}
+          />
+        </div>
         <Zoom in={true} style={{ position: "fixed", bottom: 20, right: 20 }}>
           <Fab variant="extended" color="primary" onClick={this.handleOpen}>
             <Add /> Create Sprint

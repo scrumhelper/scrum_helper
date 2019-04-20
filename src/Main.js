@@ -131,7 +131,7 @@ class Main extends React.Component {
 
   render() {
     return (
-      <div style={{ backgroundColor: "#eee" }}>
+      <div style={{ backgroundColor: "#eee", height: "100vh" }}>
         <AppBar position="sticky">
           <Toolbar style={{ backgroundColor: "black", color: "white" }}>
             <IconButton
