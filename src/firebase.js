@@ -6,6 +6,7 @@ firebase.initializeApp(config);
 export const auth = firebase.auth();
 export const db = firebase.firestore();
 export const msg = firebase.messaging();
+export const st = firebase.storage();
 // msg
 //   .requestPermission()
 //   .then(() => {

@@ -5,7 +5,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Close from "@material-ui/icons/Close";
 
 import { serverKey } from "./config.js";
-import firebase, { auth, db, msg } from "./firebase";
+import firebase, { auth, db, msg, st } from "./firebase";
 import SignIn from "./SignIn";
 import Main from "./Main";
 
@@ -408,6 +408,27 @@ class App extends Component {
     });
     this.setState({
       sprints: [...this.state.sprints.filter(s => s.id !== sprint.id), sprint]
+    });
+  };
+
+  //PARAMETERS: file
+  addImageToStorage = file => {
+    var fileName = file.name;
+    var ref = st.ref("profile_images/" + fileName);
+
+    var task = ref.put(file);
+
+    task.on("state_changed", function(snapshot){
+      //while uploading
+    },
+    function error(error){
+      console.log(error.message);
+    },
+    function(){
+      //on complete
+      task.snapshot.ref.getDownloadURL().then(function(downloadURL){
+        console.log(downloadURL);
+      });
     });
   };
 
