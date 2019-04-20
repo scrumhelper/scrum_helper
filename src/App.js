@@ -3,7 +3,7 @@ import { Route, Switch, Redirect } from "react-router-dom";
 import Snackbar from "@material-ui/core/Snackbar";
 import IconButton from "@material-ui/core/IconButton";
 import Close from "@material-ui/icons/Close";
-import ApiCalendar from 'react-google-calendar-api';
+// import ApiCalendar from 'react-google-calendar-api';
 
 import { serverKey } from "./config.js";
 import firebase, { auth, db, msg } from "./firebase";
@@ -46,7 +46,7 @@ class App extends Component {
     auth.onAuthStateChanged(user => {
       if (user) {
         this.handleAuth(user.uid);
-        ApiCalendar.handleAuthClick();
+        // ApiCalendar.handleAuthClick();
       } else {
         this.signOut();
       }
@@ -440,7 +440,7 @@ class App extends Component {
       users: []
     });
     auth.signOut();
-    ApiCalendar.handleSignoutClick();
+    // ApiCalendar.handleSignoutClick();
   };
 
   uploadFile = path => {
