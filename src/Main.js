@@ -131,7 +131,7 @@ class Main extends React.Component {
 
   render() {
     return (
-      <div style={{ backgroundColor: "#eee" }}>
+      <div style={{ backgroundColor: "#eee", height: "100vh" }}>
         <AppBar position="sticky">
           <Toolbar style={{ backgroundColor: "black", color: "white" }}>
             <IconButton
@@ -197,6 +197,10 @@ class Main extends React.Component {
                   createSprint={this.createSprint}
                   workspace={this.state.workspace}
                   sprints={this.state.sprints}
+                  users={[
+                    ...this.props.globals.users,
+                    this.props.globals.user
+                  ].filter(u => this.state.workspace.users.find(v => v  === u.id))}
                   {...navProps}
                 />
               )}
