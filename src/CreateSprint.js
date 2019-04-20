@@ -29,6 +29,7 @@ import {
 import Calendar from "./Calendar";
 import FindUser from "./FindUser";
 import UserList from "./UserList";
+import SprintCard from "./SprintCard";
 import Stepper from "./Stepper";
 import Sprint from "./Sprint";
 
@@ -37,6 +38,7 @@ class CreateSprint extends React.Component {
     super(props);
     this.state = {
       activeStep: 0,
+      name: `Sprint ${this.props.workspace.sprints.length + 1}`,
       scrumMaster: "",
       productOwner: "",
       team: [],
@@ -63,6 +65,7 @@ class CreateSprint extends React.Component {
       }
       this.setState({
         activeStep: 0,
+        name: `Sprint ${this.props.workspace.sprints.length + 1}`,
         scrumMaster: "",
         productOwner: "",
         team: [],
@@ -101,25 +104,25 @@ class CreateSprint extends React.Component {
   };
 
   updateProductBacklog = () => {
-    // console.log(this.productBacklog);
-    this.setState(
-      {
-        productBacklog: this.productBacklog.current.files[0]
-      },
-      this.handleProductClose
+    this.props.functions.save.file(this.productBacklog.current.files[0], url =>
+      this.setState(
+        {
+          productBacklog: url
+        },
+        this.handleProductClose
+      )
     );
-    // console.log(this.productBacklog.current.files[0]);
   };
 
   updateSprintBacklog = () => {
-    // console.log(this.sprintBacklog);
-    this.setState(
-      {
-        sprintBacklog: this.sprintBacklog.current.files[0]
-      },
-      this.handleSprintClose
+    this.props.functions.save.file(this.sprintBacklog.current.files[0], url =>
+      this.setState(
+        {
+          sprintBacklog: url
+        },
+        this.handleSprintClose
+      )
     );
-    // console.log(this.sprintBacklog.current.files[0]);
   };
 
   handleChange = event => {
@@ -142,19 +145,17 @@ class CreateSprint extends React.Component {
 
   handleNext = () => {
     if (this.state.activeStep + 1 === this.getSteps().length) {
-      this.props.functions.create.sprint({
-        name: `Sprint ${this.props.workspace.sprints.length + 2}`,
+      this.props.createSprint({
+        name: this.state.name,
         scrumMaster: this.state.scrumMaster,
         productOwner: this.state.productOwner,
         team: this.state.team,
         productBacklog: this.state.productBacklog,
         sprintBacklog: this.state.sprintBacklog,
-        openSprintBacklog: this.state.openSprintBacklog,
-        openProductBacklog: this.state.openProductBacklog,
-        sprintReview: this.state.sprintReview,
-        sprintRetrospective: this.state.sprintRetrospective,
-        sprintPlanning: this.state.sprintPlanning,
-        dailyScrum: this.state.dailyScrum
+        sprintReview: this.state.sprintReview.toJSON(),
+        sprintRetrospective: this.state.sprintRetrospective.toJSON(),
+        sprintPlanning: this.state.sprintPlanning.toJSON(),
+        dailyScrum: this.state.dailyScrum.toJSON()
       });
       this.props.handleClose();
     } else {
@@ -370,14 +371,12 @@ class CreateSprint extends React.Component {
         );
       case 3:
         return (
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <Typography>{`Your new sprint: ${this.state.newName}`}</Typography>
-            <Typography>{"Users"}</Typography>
-            <UserList
-              users={this.props.globals.users}
-              uids={this.state.checked}
-            />
-          </div>
+          <SprintCard
+            sprint={this.state}
+            users={this.props.users}
+            workspace={this.props.workspace}
+            link={false}
+          />
         );
     }
   };
@@ -404,8 +403,9 @@ class CreateSprint extends React.Component {
               (this.state.productBacklog === null ||
                 this.state.sprintBacklog === null)) ||
             (this.state.activeStep === 2 &&
-              (this.state.sprintPlanning.getTime() >=
-                this.state.sprintReview.getTime() ||
+              (this.state.sprintPlanning.getTime() >= new Date().getTime() ||
+                this.state.sprintPlanning.getTime() >=
+                  this.state.sprintReview.getTime() ||
                 this.state.sprintPlanning.getTime() >=
                   this.state.sprintRetrospective.getTime() ||
                 this.state.sprintReview.getTime() >=
@@ -440,16 +440,9 @@ class CreateSprint extends React.Component {
             </Button>
           </DialogContent>
         </Dialog>
-        <Sprint {...this.state} users={this.props.users} workspace={this.props.workspace} />
       </Dialog>
     );
   }
-
-  handleSubmit = () => {
-    console.log(this.input);
-    console.log(this.productBacklog);
-    console.log(this.sprintBacklog);
-  };
 }
 
 export default CreateSprint;

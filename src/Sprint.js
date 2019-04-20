@@ -12,31 +12,47 @@ class Sprint extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      ...this.newSprint()
+      sprint: this.newSprint()
     };
   }
 
   newSprint() {
     return {
-      id: null
+      id: null,
+      scrumMaster: "",
+      productOwner: "",
+      team: [],
+      productBacklog: null,
+      sprintBacklog: null,
+      openSprintBacklog: false,
+      openProductBacklog: false,
+      sprintReview: new Date(),
+      sprintRetrospective: new Date(),
+      sprintPlanning: new Date(),
+      dailyScrum: new Date()
     };
   }
 
-  componentDidUpdate() {
-    // const newID = this.props.match.params.sid || null;
-    // const oldID = this.state.sprint.id || null;
-    // if (newID !== oldID) {
-    //   if (oldID !== null) this.props.functions.save.sprint(this.state.sprint);
-    //   if (newID === null)
-    //     this.setState({
-    //       sprint: this.newSprint()
-    //     });
-    //   else
-    //     this.setState({
-    //       sprint: this.props.sprints.find(s => s.id === newID)
-    //     });
-    // }
-  }
+  componentDidMount = () => {
+    this.update();
+  };
+
+  componentDidUpdate = () => {
+    this.update();
+  };
+
+  update = () => {
+    const newID = this.props.match.params.sid || null;
+    const oldID = this.state.sprint.id || null;
+
+    if (newID !== oldID) {
+      if (oldID !== null) this.props.functions.save.sprint(this.state.sprint);
+      if (newID === null) this.setState({ sprint: this.newSprint() });
+      else {
+        this.setState({ sprint: this.props.sprints.find(s => s.id === newID) });
+      }
+    }
+  };
 
   dateFormatter = date => {
     let dateNames = [
@@ -66,28 +82,28 @@ class Sprint extends React.Component {
       <div>
         <Paper>
           <div style={{ padding: 20 }}>
-            <Typography variant="h3">{this.props.name}</Typography>
+            <Typography variant="h3">{this.state.sprint.name}</Typography>
             <Typography variant="h4">Roles</Typography>
             <Typography variant="h5">Scrum Master</Typography>
             <UserList
               users={this.props.users}
-              uids={[this.props.scrumMaster]}
+              uids={[this.state.sprint.scrumMaster]}
             />
             <Typography variant="h5">Product Owner</Typography>
             <UserList
               users={this.props.users}
-              uids={[this.props.productOwner]}
+              uids={[this.state.sprint.productOwner]}
             />
             <Typography variant="h5">Current Team</Typography>
-            <UserList users={this.props.users} uids={this.props.team} />
+            <UserList users={this.props.users} uids={this.state.sprint.team} />
             <Typography variant="h4">Events</Typography>
             <div style={{ display: "flex", alignItems: "center" }}>
               <div>
                 <Calendar
                   dates={[
-                    this.props.sprintPlanning,
-                    this.props.sprintReview,
-                    this.props.sprintRetrospective
+                    this.state.sprint.sprintPlanning,
+                    this.state.sprint.sprintReview,
+                    this.state.sprint.sprintRetrospective
                   ]}
                 />
               </div>
@@ -103,7 +119,7 @@ class Sprint extends React.Component {
                 >
                   <Typography>Sprint Planning</Typography>
                   <Typography>
-                    {this.dateFormatter(this.props.sprintPlanning)}
+                    {this.dateFormatter(this.state.sprint.sprintPlanning)}
                   </Typography>
                 </Card>
                 <Card
@@ -117,7 +133,7 @@ class Sprint extends React.Component {
                 >
                   <Typography>Daily Scrum</Typography>
                   <Typography>{`Everyday at ${this.timeFormatter(
-                    this.props.dailyScrum
+                    this.state.sprint.dailyScrum
                   )}`}</Typography>
                 </Card>
                 <Card
@@ -131,7 +147,7 @@ class Sprint extends React.Component {
                 >
                   <Typography>Sprint Review</Typography>
                   <Typography>
-                    {this.dateFormatter(this.props.sprintReview)}
+                    {this.dateFormatter(this.state.sprint.sprintReview)}
                   </Typography>
                 </Card>
                 <Card
@@ -145,7 +161,7 @@ class Sprint extends React.Component {
                 >
                   <Typography>Sprint Retrospective</Typography>
                   <Typography>
-                    {this.dateFormatter(this.props.sprintRetrospective)}
+                    {this.dateFormatter(this.state.sprint.sprintRetrospective)}
                   </Typography>
                 </Card>
               </div>

@@ -21,12 +21,11 @@ export default class Calendar extends React.Component {
         theme={{
           selectionColor: dateStr => {
             let date = new Date(dateStr);
-            console.log(date)
-            console.log(date.getDate())
 
             let index = -1;
-            for(let i = this.props.dates.length - 1; i >= 0; i--) {
-              if (this.props.dates[i].getDate() === date.getDate() + 1) index = i;
+            for (let i = this.props.dates.length - 1; i >= 0; i--) {
+              if (this.props.dates[i].getDate() === date.getDate() + 1)
+                index = i;
             }
 
             if (index === 0) return "#0000cc";

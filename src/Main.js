@@ -44,26 +44,7 @@ class Main extends React.Component {
 
   createSprint = sprint => {
     db.collection("sprints")
-      .add({ id: "sprint 1" })
-      // .add({
-      //   artifacts: {
-      //     productBacklog: null,
-      //     sprintBacklog: null,
-      //     sprintRetrospective: null,
-      //     sprintPlanning: null
-      //   },
-      //   roles: {
-      //     scrumMaster: null,
-      //     productOwner: null,
-      //     team: [this.state.uid]
-      //   },
-      //   events: {
-      //     sprintReview: null,
-      //     dailyScrum: null,
-      //     sprintPlanning: null,
-      //     sprintRetrospective: null
-      //   }
-      // })
+      .add(sprint)
       .then(docRef => {
         db.collection("sprints")
           .doc(docRef.id)
@@ -72,17 +53,18 @@ class Main extends React.Component {
               id: docRef.id
             },
             { merge: true }
-          );
-
-        this.addSprintToWorkspace(docRef.id, sprint);
-        this.props.functions.load.sprint(docRef.id, () =>
-          this.setState({
-            sprints: [
-              ...this.state.sprints,
-              this.props.globals.sprints.find(s => s.id === docRef.id)
-            ]
-          })
-        );
+          )
+          .then(() => {
+            this.addSprintToWorkspace(docRef.id, docRef.id);
+            this.props.functions.load.sprint(docRef.id, () =>
+              this.setState({
+                sprints: [
+                  ...this.state.sprints,
+                  this.props.globals.sprints.find(s => s.id === docRef.id)
+                ]
+              })
+            );
+          });
       });
   };
 
@@ -131,7 +113,7 @@ class Main extends React.Component {
 
   render() {
     return (
-      <div style={{ backgroundColor: "#eee", height: "100vh" }}>
+      <div>
         <AppBar position="sticky">
           <Toolbar style={{ backgroundColor: "black", color: "white" }}>
             <IconButton
@@ -184,6 +166,12 @@ class Main extends React.Component {
                   createSprint={this.createSprint}
                   workspace={this.state.workspace}
                   sprints={this.state.sprints}
+                  users={[
+                    ...this.props.globals.users,
+                    this.props.globals.user
+                  ].filter(u =>
+                    this.state.workspace.users.find(v => v === u.id)
+                  )}
                   {...navProps}
                 />
               )}
@@ -200,7 +188,9 @@ class Main extends React.Component {
                   users={[
                     ...this.props.globals.users,
                     this.props.globals.user
-                  ].filter(u => this.state.workspace.users.find(v => v  === u.id))}
+                  ].filter(u =>
+                    this.state.workspace.users.find(v => v === u.id)
+                  )}
                   {...navProps}
                 />
               )}

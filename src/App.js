@@ -300,10 +300,6 @@ class App extends Component {
     );
   };
 
-  createSprint = sprint => {
-    console.log(sprint);
-  };
-
   loadDoc = (collection, id, success, error) => {
     db.collection(collection)
       .doc(id)
@@ -370,10 +366,10 @@ class App extends Component {
       "sprints",
       sid,
       s => {
-        // s.events.sprintReview = new Date(s.events.sprintReview);
-        // s.events.dailyScrum = new Date(s.events.dailyScrum);
-        // s.events.sprintPlanning = new Date(s.events.sprintPlanning);
-        // s.events.sprintRetrospective = new Date(s.events.sprintRetrospective);
+        s.sprintReview = new Date(s.sprintReview);
+        s.dailyScrum = new Date(s.dailyScrum);
+        s.sprintPlanning = new Date(s.sprintPlanning);
+        s.sprintRetrospective = new Date(s.sprintRetrospective);
 
         this.setState(
           {
@@ -427,24 +423,28 @@ class App extends Component {
   };
 
   //PARAMETERS: file
-  addImageToStorage = file => {
+  addImageToStorage = (file, callback) => {
     var fileName = file.name;
     var ref = st.ref("profile_images/" + fileName);
 
     var task = ref.put(file);
 
-    task.on("state_changed", function(snapshot){
-      //while uploading
-    },
-    function error(error){
-      console.log(error.message);
-    },
-    function(){
-      //on complete
-      task.snapshot.ref.getDownloadURL().then(function(downloadURL){
-        console.log(downloadURL);
-      });
-    });
+    task.on(
+      "state_changed",
+      function(snapshot) {
+        //while uploading
+      },
+      function error(error) {
+        console.log(error.message);
+      },
+      function() {
+        //on complete
+        task.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+          callback(downloadURL);
+          console.log(downloadURL);
+        });
+      }
+    );
   };
 
   signedIn = () => {
@@ -483,7 +483,7 @@ class App extends Component {
             }
           />
           <Route
-            path="/workspace/:wid?"
+            path="/workspace/:wid?/:sid?"
             render={navProps =>
               this.signedIn() ? (
                 <Main
@@ -492,7 +492,8 @@ class App extends Component {
                     save: {
                       user: this.saveUser,
                       workspace: this.saveWorkspace,
-                      sprint: this.saveSprint
+                      sprint: this.saveSprint,
+                      file: this.addImageToStorage
                     },
                     load: {
                       user: this.loadUser,

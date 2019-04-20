@@ -54,8 +54,8 @@ class Workspace extends React.Component {
           <Typography variant="h5">Sprints</Typography>
           <SprintList
             functions={this.props.functions}
-            createSprint={this.createSprint}
             workspace={this.props.workspace}
+            users={this.props.users}
             sprints={this.props.sprints}
           />
         </div>
@@ -67,6 +67,7 @@ class Workspace extends React.Component {
         <CreateSprint
           globals={this.props.globals}
           functions={this.props.functions}
+          createSprint={this.props.createSprint}
           handleClose={this.handleClose}
           open={this.state.open}
           users={this.props.users}
