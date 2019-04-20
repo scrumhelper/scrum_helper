@@ -62,7 +62,7 @@ class CreateSprint extends React.Component {
         dates[i].setMinutes(0, 0, 0);
       }
       this.setState({
-        activeStep: 2,
+        activeStep: 0,
         scrumMaster: "",
         productOwner: "",
         team: [],
