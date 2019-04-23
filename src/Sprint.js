@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, Switch, Route } from "react-router-dom";
+import { pdfjs, Document, Page } from "react-pdf";
 // import ApiCalendar from "react-google-calendar-api";
 import Card from "@material-ui/core/Card";
 import Typography from "@material-ui/core/Typography";
@@ -8,11 +9,17 @@ import Paper from "@material-ui/core/Paper";
 import Calendar from "./Calendar";
 import UserList from "./UserList";
 
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${
+  pdfjs.version
+}/pdf.worker.js`;
+
 class Sprint extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      sprint: this.newSprint()
+      sprint: this.newSprint(),
+      numPages: null,
+      pageNumber: 1
     };
   }
 
@@ -75,6 +82,10 @@ class Sprint extends React.Component {
     return `${date.getHours()}:${
       date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()
     }`;
+  };
+
+  onDocumentLoadSuccess = ({ numPages }) => {
+    this.setState({ numPages });
   };
 
   render() {
@@ -166,6 +177,13 @@ class Sprint extends React.Component {
                 </Card>
               </div>
             </div>
+            <Typography variant="h4">Artifacts</Typography>
+            <Document file={this.state.sprint.productBacklog}>
+              <Page pageNumber={this.state.pageNumber} />
+            </Document>
+            <Typography>{`Page ${this.state.pageNumber} of ${
+              this.state.numPages
+            }`}</Typography>
           </div>
         </Paper>
       </div>
