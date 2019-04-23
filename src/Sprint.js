@@ -5,6 +5,7 @@ import { pdfjs, Document, Page } from "react-pdf";
 import Card from "@material-ui/core/Card";
 import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
+import Button from "@material-ui/core/Button";
 
 import Calendar from "./Calendar";
 import UserList from "./UserList";
@@ -18,8 +19,10 @@ class Sprint extends React.Component {
     super(props);
     this.state = {
       sprint: this.newSprint(),
-      numPages: null,
-      pageNumber: 1
+      numPagesSprint: null,
+      pageNumberSprint: 1,
+      numPagesProduct: null,
+      pageNumberProduct: 1
     };
   }
 
@@ -84,8 +87,12 @@ class Sprint extends React.Component {
     }`;
   };
 
-  onDocumentLoadSuccess = ({ numPages }) => {
-    this.setState({ numPages });
+  onProductDocumentLoadSuccess = ({ numPages }) => {
+    this.setState({ numPagesProduct: numPages });
+  };
+
+  onSprintDocumentLoadSuccess = ({ numPages }) => {
+    this.setState({ numPagesSprint: numPages });
   };
 
   render() {
@@ -178,12 +185,114 @@ class Sprint extends React.Component {
               </div>
             </div>
             <Typography variant="h4">Artifacts</Typography>
-            <Document file={this.state.sprint.productBacklog}>
-              <Page pageNumber={this.state.pageNumber} />
-            </Document>
-            <Typography>{`Page ${this.state.pageNumber} of ${
-              this.state.numPages
-            }`}</Typography>
+            <div style={{ display: "flex", flexWrap: "wrap" }}>
+              <Typography variant="h6">Product Backlog</Typography>
+              <div
+                style={{
+                  display: "flex",
+                  height: "100vh",
+                  width: "100vw",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "column"
+                }}
+              >
+                <Document
+                  file={this.state.sprint.productBacklog}
+                  onLoadSuccess={this.onProductDocumentLoadSuccess}
+                  onItemClick={({ pageNumber }) =>
+                    this.setState({ pageNumberProduct: pageNumber++ })
+                  }
+                >
+                  <Page pageNumber={this.state.pageNumberProduct} />
+                </Document>
+                <div>
+                  <Typography>{`Page ${this.state.pageNumberProduct} of ${
+                    this.state.numPagesProduct
+                  }`}</Typography>
+                  <Button
+                    variant="contained"
+                    onClick={() =>
+                      this.setState({
+                        pageNumberProduct:
+                          this.state.pageNumberProduct - 1 > 0
+                            ? this.state.pageNumberProduct - 1
+                            : this.state.pageNumberProduct
+                      })
+                    }
+                  >
+                    Previous Page
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() =>
+                      this.setState({
+                        pageNumberProduct:
+                          this.state.pageNumberProduct + 1 <=
+                          this.state.numPagesProduct
+                            ? this.state.pageNumberProduct + 1
+                            : this.state.pageNumberProduct
+                      })
+                    }
+                  >
+                    Next Page
+                  </Button>
+                </div>
+              </div>
+              <Typography variant="h6">Sprint Backlog</Typography>
+              <div
+                style={{
+                  display: "flex",
+                  height: "100vh",
+                  width: "100vw",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "column"
+                }}
+              >
+                <Document
+                  file={this.state.sprint.sprintBacklog}
+                  onLoadSuccess={this.onSprintDocumentLoadSuccess}
+                  onItemClick={({ pageNumber }) =>
+                    this.setState({ pageNumberSprint: pageNumber++ })
+                  }
+                >
+                  <Page pageNumber={this.state.pageNumberSprint} />
+                </Document>
+                <div>
+                  <Typography>{`Page ${this.state.pageNumberSprint} of ${
+                    this.state.numPagesSprint
+                  }`}</Typography>
+                  <Button
+                    variant="contained"
+                    onClick={() =>
+                      this.setState({
+                        pageNumberSprint:
+                          this.state.pageNumberSprint - 1 > 0
+                            ? this.state.pageNumberSprint - 1
+                            : this.state.pageNumberSprint
+                      })
+                    }
+                  >
+                    Previous Page
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() =>
+                      this.setState({
+                        pageNumberSprint:
+                          this.state.pageNumberSprint + 1 <=
+                          this.state.numPagesSprint
+                            ? this.state.pageNumberSprint + 1
+                            : this.state.pageNumberSprint
+                      })
+                    }
+                  >
+                    Next Page
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         </Paper>
       </div>
