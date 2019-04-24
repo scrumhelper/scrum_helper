@@ -93,7 +93,11 @@ class JoinWorkspace extends React.Component {
         return (
           <div>
             <Typography>{`Workspace you are joining:`}</Typography>
-            <WorkspaceCard {...this.state.workspace} link={false}/>
+            <WorkspaceCard
+              globals={this.props.globals}
+              {...this.state.workspace}
+              link={false}
+            />
           </div>
         );
     }
