@@ -48,7 +48,7 @@ class UserList extends React.Component {
               <ListItemAvatar>
                 <Avatar alt={`Avatar`} src={u.photo} />
               </ListItemAvatar>
-              <ListItemText primary={u.name} />
+              <ListItemText primary={u.name} secondary={u.id} />
               {this.props.checkable && (
                 <ListItemSecondaryAction>
                   <Checkbox
