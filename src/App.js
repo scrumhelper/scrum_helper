@@ -289,8 +289,8 @@ class App extends Component {
   };
 
   leaveWorkspace = wid => {
-    const ws = this.state.workspaces.find(w => w.id === wid);
-    ws.users = ws.users.filter(u => u !== this.state.uid);
+    // const ws = this.state.workspaces.find(w => w.id === wid);
+    // ws.users = ws.users.filter(u => u !== this.state.uid);
 
     //this.saveWorkspace(ws);
 
@@ -300,7 +300,7 @@ class App extends Component {
           ...this.state.user,
           workspaces: this.state.user.workspaces.filter(w => w !== wid)
         },
-        workspaces: [...this.state.workspaces.filter(w => w.id !== wid), ws]
+        // workspaces: [...this.state.workspaces.filter(w => w.id !== wid), ws]
       }
       //this.saveUser
     );
