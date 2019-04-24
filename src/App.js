@@ -266,6 +266,9 @@ class App extends Component {
   addUserToWorkspace = (uid, wid) => {
     const ws = this.state.workspaces.find(w => w.id === wid);
     ws.users = [...ws.users, uid];
+    this.setState({
+      workspaces: [...this.state.workspaces.filter(w => w.id !== wid), ws]
+    });
     this.saveDoc("workspaces", wid, ws, () =>
       this.throwSnackError(
         `Could not add user - ${uid} - to workspace - ${wid}`
@@ -293,9 +296,9 @@ class App extends Component {
         user: {
           ...this.state.user,
           workspaces: this.state.user.workspaces.filter(w => w !== wid)
-        },
+        }
         //workspaces: [...this.state.workspaces.filter(w => w.id !== wid), ws]
-      },
+      }
       //this.saveUser
     );
   };
