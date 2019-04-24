@@ -45,11 +45,19 @@ class WorkspaceList extends React.Component {
             justifyContent: "center"
           }}
         >
-          {this.props.globals.workspaces
-            .filter(w => w.users.find(u => u === this.props.globals.user.id))
-            .map((w, index) => (
-              <WorkspaceCard key={index} {...w} globals={this.props.globals} />
-            ))}
+          {this.props.globals.user.workspaces.map(wid => (
+            <WorkspaceCard
+              key={wid}
+              {...this.props.globals.workspaces.find(w => w.id === wid)}
+              globals={this.props.globals}
+            />
+          ))}
+          {
+            // .filter(w => w.users.find(u => u === this.props.globals.user.id))
+            // .map((w, index) => (
+            // <WorkspaceCard key={index} {...w} globals={this.props.globals} />
+            // ))}
+          }
         </div>
         <Zoom in={true} style={{ position: "fixed", bottom: 20, right: 20 }}>
           <div

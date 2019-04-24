@@ -43,17 +43,21 @@ class Workspace extends React.Component {
             variant="contained"
             color="secondary"
             onClick={() => {
-              fetch("https://us-central1-scrum-helper-73afc.cloudfunctions.net/leaveGroup", {
-                method: "POST",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                  workspace: this.props.workspace.id,
-                  user: this.props.globals.user.id
-                })
-              })
+              fetch(
+                "https://us-central1-scrum-helper-73afc.cloudfunctions.net/leaveGroup",
+                {
+                  method: "POST",
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify({
+                    workspace: this.props.workspace.id,
+                    user: this.props.globals.user.id
+                  })
+                }
+              );
+
               this.props.functions.leave.workspace(this.props.workspace.id);
               this.props.history.goBack();
             }}
