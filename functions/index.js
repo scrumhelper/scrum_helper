@@ -1,8 +1,12 @@
+
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const cors = require('cors')({
+  origin: true
+});
+
 admin.initializeApp(functions.config().firebase);
 var db = admin.firestore();
-var st = admin.storage();
 
 
 // // Create and Deploy Your First Cloud Functions
@@ -103,5 +107,65 @@ exports.createSprint = functions.https.onRequest((request, response) => {
   }).catch(function(error) {
     console.error("Error adding user: ", error);
     throw new Error(error);
+  });
+});
+
+
+//PARAMETERS: filePath
+exports.getFile = functions.https.onRequest((request, response) => {
+  var filePath = request.body.filePath;
+  if(filePath == null){
+    throw new Error("No file path");
+  }
+  var ref = st.refFromURL(filePath);
+
+  console.log(ref);
+  console.log(ref.Name);
+  response.send("success");
+});
+
+
+//PARAMETERS: workspace, user
+exports.leaveGroup = functions.https.onRequest((request, response) => {
+  return cors(request, response, () => {
+    var workspace = request.body.workspace;
+    var user = request.body.user;
+
+    console.log(workspace);
+    console.log(user);
+    if (workspace == null) {
+      throw new Error("Must pass workspace in body of request");
+    }
+    if (user == null) {
+      throw new Error("Must pass user in body of request");
+    }
+
+
+    var userDoc = db.collection("users").doc(user);
+    var wsDoc = db.collection("workspaces").doc(workspace);
+
+
+    userDoc.update({
+      workspaces: admin.firestore.FieldValue.arrayRemove(workspace)
+    }).then(function(){
+      wsDoc.get().then(doc => {
+        if(doc.data().users.length == 0){
+          wsDoc.delete().then(function(){
+            response.send({"success": true});
+          }).catch(function (error){
+            throw new Error(error);
+          });
+        }
+        else{
+          wsDoc.update({
+            users: admin.firestore.FieldValue.arrayRemove(user)
+          }).then(function(){
+            response.send({"success": true});
+          }).catch(function(error){
+            throw new Error(error);
+          });
+        }
+      });
+    });
   });
 });
