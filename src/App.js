@@ -225,7 +225,10 @@ class App extends Component {
     db.collection("workspaces")
       .add({
         name: workspace.name,
-        users: [this.state.uid, ...workspace.users],
+        users: [
+          ...workspace.users.filter(u => u !== this.state.uid),
+          this.state.uid
+        ],
         sprints: []
       })
       .then(docRef => {
@@ -265,7 +268,7 @@ class App extends Component {
 
   addUserToWorkspace = (uid, wid) => {
     const ws = this.state.workspaces.find(w => w.id === wid);
-    ws.users = [...ws.users, uid];
+    ws.users = [...ws.users.filter(u => u !== uid), uid];
     this.setState({
       workspaces: [...this.state.workspaces.filter(w => w.id !== wid), ws]
     });
@@ -278,7 +281,7 @@ class App extends Component {
 
   addWorkspaceToUser = (uid, wid) => {
     const user = this.state.users.find(u => u.id === uid);
-    user.workspaces = [...user.workspaces, wid];
+    user.workspaces = [...user.workspaces.filter(w => w.id !== wid), wid];
     this.saveDoc("users", uid, user, () =>
       this.throwSnackError(`Could add workspace - ${wid} - to user ${uid}`)
     );
@@ -286,8 +289,8 @@ class App extends Component {
   };
 
   leaveWorkspace = wid => {
-    //const ws = this.state.workspaces.find(w => w.id === wid);
-    //ws.users = ws.users.filter(u => u !== this.state.uid);
+    const ws = this.state.workspaces.find(w => w.id === wid);
+    ws.users = ws.users.filter(u => u !== this.state.uid);
 
     //this.saveWorkspace(ws);
 
@@ -296,8 +299,8 @@ class App extends Component {
         user: {
           ...this.state.user,
           workspaces: this.state.user.workspaces.filter(w => w !== wid)
-        }
-        //workspaces: [...this.state.workspaces.filter(w => w.id !== wid), ws]
+        },
+        workspaces: [...this.state.workspaces.filter(w => w.id !== wid), ws]
       }
       //this.saveUser
     );
