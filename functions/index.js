@@ -149,7 +149,8 @@ exports.leaveGroup = functions.https.onRequest((request, response) => {
       workspaces: admin.firestore.FieldValue.arrayRemove(workspace)
     }).then(function(){
       wsDoc.get().then(doc => {
-        if(doc.data().users.length == 0){
+        console.log(doc.data().users.length);
+        if(doc.data().users.length == 0 || doc.data().users.length == 1 && doc.data().users[0] == user){
           wsDoc.delete().then(function(){
             response.send({"success": true});
           }).catch(function (error){
@@ -157,6 +158,7 @@ exports.leaveGroup = functions.https.onRequest((request, response) => {
           });
         }
         else{
+          console.log(doc.data().users.length);
           wsDoc.update({
             users: admin.firestore.FieldValue.arrayRemove(user)
           }).then(function(){
