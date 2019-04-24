@@ -104,14 +104,20 @@ class CreateSprint extends React.Component {
   };
 
   updateProductBacklog = () => {
-    this.props.functions.save.file(this.productBacklog.current.files[0], url =>
-      this.setState(
-        {
-          productBacklog: url
-        },
-        this.handleProductClose
-      )
-    );
+    if (this.productBacklog.current.files[0].name.indexOf(".pdf") === -1) {
+      alert("Must be a pdf file!");
+    } else {
+      this.props.functions.save.file(
+        this.productBacklog.current.files[0],
+        url =>
+          this.setState(
+            {
+              productBacklog: url
+            },
+            this.handleProductClose
+          )
+      );
+    }
   };
 
   updateSprintBacklog = () => {
