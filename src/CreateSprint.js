@@ -409,7 +409,7 @@ class CreateSprint extends React.Component {
               (this.state.productBacklog === null ||
                 this.state.sprintBacklog === null)) ||
             (this.state.activeStep === 2 &&
-              (this.state.sprintPlanning.getTime() >= new Date().getTime() ||
+              (this.state.sprintPlanning.getTime() < new Date().getTime() ||
                 this.state.sprintPlanning.getTime() >=
                   this.state.sprintReview.getTime() ||
                 this.state.sprintPlanning.getTime() >=
