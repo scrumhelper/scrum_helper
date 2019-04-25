@@ -59,7 +59,7 @@ class Workspace extends React.Component {
               );
 
               this.props.functions.leave.workspace(this.props.workspace.id);
-              this.props.history.goBack();
+              this.props.history.push("/workspace");
             }}
           >
             <ExitToApp />
