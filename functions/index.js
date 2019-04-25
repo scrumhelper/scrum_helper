@@ -151,6 +151,15 @@ exports.leaveGroup = functions.https.onRequest((request, response) => {
       wsDoc.get().then(doc => {
         console.log(doc.data().users.length);
         if(doc.data().users.length == 0 || doc.data().users.length == 1 && doc.data().users[0] == user){
+          //delete the sprints
+          var sprints = doc.data().sprints;
+          for(var i = 0; i < sprints.length; i++){
+            db.collection("sprints").doc(sprints[i]).delete().catch(function (error){
+              throw new Error(error);
+            });
+          }
+
+          //delete the doc
           wsDoc.delete().then(function(){
             response.send({"success": true});
           }).catch(function (error){
